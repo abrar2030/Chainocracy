@@ -1,0 +1,67 @@
+name: Main CI/CD Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      web-frontend: ${{ steps.filter.outputs.web-frontend }}
+      mobile-frontend: ${{ steps.filter.outputs.mobile-frontend }}
+      docs: ${{ steps.filter.outputs.docs }}
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Check for file changes
+      uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          backend:
+            - 'backend-api/**'
+          web-frontend:
+            - 'web-frontend/**'
+          mobile-frontend:
+            - 'mobile-frontend/**'
+          docs:
+            - 'docs/**'
+
+  trigger-workflows:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Backend Workflow
+        if: needs.detect-changes.outputs.backend == 'true'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Backend API CI/CD
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Trigger Web Frontend Workflow
+        if: needs.detect-changes.outputs.web-frontend == 'true'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Web Frontend CI/CD
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Trigger Mobile Frontend Workflow
+        if: needs.detect-changes.outputs.mobile-frontend == 'true'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Mobile Frontend CI/CD
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Trigger Documentation Workflow
+        if: needs.detect-changes.outputs.docs == 'true'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Documentation CI/CD
+          token: ${{ secrets.GITHUB_TOKEN }}

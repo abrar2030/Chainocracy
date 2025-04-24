@@ -31,11 +31,11 @@ The project is organized into several main components:
 
 ```
 chainocracy/
-├── backend-api/           # Node.js/Express backend with blockchain implementation
-├── docs/                  # Project documentation (Sphinx)
-├── mobile-frontend/       # React Native mobile application for voters
-├── public/                # Public assets
-└── web-frontend/          # React web application for committee members
+├── backend-api/           
+├── docs/                  
+├── mobile-frontend/       
+├── public/                
+└── web-frontend/          
 ```
 
 ### Backend API
