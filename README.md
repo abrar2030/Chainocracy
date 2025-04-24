@@ -2,6 +2,9 @@
 
 A full-stack Web and Mobile application for American elections using Blockchain Technology. The system presents a user-friendly interface accessible via both web browsers and mobile platforms.
 
+>**Note**: Chainocracy is currently under active development. Features and functionalities are being added and improved continuously to enhance user experience.
+
+
 ## Table of Contents
 - [Overview](#overview)
 - [Project Structure](#project-structure)
@@ -235,7 +238,6 @@ Comprehensive documentation is available in the `docs` directory. To build and v
 ```bash
 cd docs
 make html
-# Open _build/html/index.html in your browser
 ```
 
 ## Contributing
