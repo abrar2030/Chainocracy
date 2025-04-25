@@ -2,8 +2,11 @@
 
 A full-stack Web and Mobile application for American elections using Blockchain Technology. The system presents a user-friendly interface accessible via both web browsers and mobile platforms.
 
->**Note**: Chainocracy is currently under active development. Features and functionalities are being added and improved continuously to enhance user experience.
+<div align="center">
+  <img src="Chainocracy.bmp" alt="Cross-Chain Asset Management" width="100%">
+</div>
 
+> **Note**: This Project is currently under active development. Features and functionalities are being added and improved continuously to enhance user experience.
 
 ## Table of Contents
 - [Overview](#overview)
