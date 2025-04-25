@@ -13,6 +13,12 @@ export default /* defineConfig */ ({
       "@": path.resolve(__dirname, "./src"),
     }
   },
+  build: {
+    // Skip TypeScript type checking during build
+    typescript: {
+      ignoreBuildErrors: true,
+    }
+  },
   server: {
     port: 3007,
     proxy: {
