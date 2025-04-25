@@ -1,42 +1,25 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
-import path from "path"
-
-import dotenv from "dotenv";
-dotenv.config();
+import path from 'path'
 
 // https://vitejs.dev/config/
-export default /* defineConfig */ ({
+export default defineConfig({
   plugins: [react()],
+  build: {
+    minify: false, // Disable minification to reduce memory usage
+    sourcemap: false, // Disable sourcemaps to reduce memory usage
+    chunkSizeWarningLimit: 1000, // Increase chunk size warning limit
+  },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-    }
-  },
-  build: {
-    // Skip TypeScript type checking during build
-    typescript: {
-      ignoreBuildErrors: true,
-    }
+      '@': path.resolve(__dirname, './src'),
+    },
   },
   server: {
-    port: 3007,
-    proxy: {
-      '/api/committee/auth-web': {
-        target: 'http://localhost:3010/',
-        changeOrigin: true,
-      }
-    }
-  },
-  define: {
-    'process.env': process.env,
-  }, optimizeDeps: {
-    include: ['js-cookie'],
-  }, test: {
-    globals: true,
-    environment: 'jsdom',
-    css: true,
-    setupFiles: './src/tests/setup.ts',
-    reporters: ['html']
+    host: true,
+    allowedHosts: [
+      'localhost',
+      '.manus.computer'
+    ]
   }
 })

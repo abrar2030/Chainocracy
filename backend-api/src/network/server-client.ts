@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import BlockChain from "../blockchain/blockchain";
 
 // P2P Star Topology network
-const baseConfig = require('../config');
+import baseConfig from '../config';
 
 const axios = require('axios');
 const express = require('express');
