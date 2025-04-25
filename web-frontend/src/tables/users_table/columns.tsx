@@ -1,75 +1,82 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { ColumnDef } from "@tanstack/react-table"
-import CustomDropMenuUser from "./CustomDropMenuUser"
-import { User } from "@/data_types";
+import { User } from '@/data_types';
+import { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const columns: ColumnDef<User>[] = [
-    {
-        accessorKey: "id",
-        header: "ID",
+  {
+    accessorKey: "name",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Name
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
     },
-    {
-        accessorKey: "name",
-        header: "Name",
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
+  },
+  {
+    accessorKey: "photoURL",
+    header: "Photo",
+    cell: ({ row }) => {
+      const user = row.original;
+      const url = user.photoURL;
+      return url ? (
+        <img
+          src={url}
+          alt={user.name || "User"}
+          className="h-10 w-10 rounded-full"
+        />
+      ) : (
+        <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+      );
     },
-    {
-        accessorKey: "username",
-        header: "Username",
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const user = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(user.id || "")}
+            >
+              Copy user ID
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>View user</DropdownMenuItem>
+            <DropdownMenuItem>Edit user</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
     },
-    {
-        accessorKey: "password",
-        header: "Password",
-        cell: ({ row }) => {
-            const password: string = row.getValue("password");
-            if (typeof password === 'string')
-                return (
-                    <span>{password.substring(0, ("0xabcdef123456789").length)}...</span>
-                );
-            else return '';
-        }
-    },
-    {
-        accessorKey: "photo",
-        header: "Photo",
-        cell: ({ row }) => {
-            const user = row.original;
-            const url = user.photo;
-            return (
-                <>
-                    <img height={60} width={60} src={url} className="rounded-full"></img>
-                </>
-            )
-        },
-    },
-    {
-        accessorKey: "refreshToken",
-        header: "Refresh Token",
-        cell: ({ row }) => {
-            const refreshToken: string = row.getValue("refreshToken");
-            if (typeof refreshToken === 'string')
-                return (
-                    <span>{refreshToken.substring(0, ("rerewrwererxabcdef123456789").length)}...</span>
-                );
-            else return '';
-        }
-    },
-    {
-        accessorKey: "role",
-        header: "Role",
-    },
-    {
-        accessorKey: "timestamp",
-        header: "Created at",
-    },
-    {
-        id: "actions",
-        cell: ({ row }) => {
-            const user = row.original;
-            return (
-                <>
-                    <CustomDropMenuUser user={user} />
-                </>
-            )
-        },
-    },
-]
+  },
+];
