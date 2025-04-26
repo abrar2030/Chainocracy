@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Chainocracy",
-    "slug": "election-blockchain-angola",
+    "slug": "chainocracy-voter",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
@@ -20,38 +20,29 @@
         "usesNonEmptEncryption": false
       },
       "usesIcloudStorage": true,
-      "bundleIdentifier": "com.blockchain.election",
-      "infoPlist": {
-        "UIBackgroundModes": [
-          "audio"
-        ]
-      },
-      "android": {
-        "adaptiveIcon": {
-          "foregroundImage": "./assets/adaptive-icon.png",
-          "backgroundColor": "#ffffff"
-        }
-      },
-      "web": {
-        "favicon": "./assets/favicon.png"
-      },
-      "plugins": [
-        "expo-font",
-        "expo-secure-store",
-        "expo-av"
-      ]
+      "bundleIdentifier": "com.blockchain.election"
     },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.blockchain.election"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-secure-store",
+      "expo-av"
+    ],
     "extra": {
       "eas": {
         "projectId": "23db0c99-ac06-4556-8c80-693fb773a032"
       }
     },
-    "owner": "alfredomartins624",
-    "plugins": [
-      "expo-font"
-    ],
-    "android": {
-      "package": "com.blockchain.election"
-    }
+    "owner": "alfredomartins624"
   }
 }

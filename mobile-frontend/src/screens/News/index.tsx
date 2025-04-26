@@ -1,221 +1,111 @@
-import { Header } from '@components/Header';
-import { StyleSheet, View, Text, FlatList, SafeAreaView } from 'react-native';
-import React, { Component, useEffect, useState } from 'react';
-import { NewsItem } from '@components/NewsItem';
+import { View, StyleSheet, Text, ScrollView, TouchableOpacity } from 'react-native';
+import theme from 'src/theme';
 import { useAuth } from 'src/context/AuthContext';
 import axios from 'src/api/axios';
-import Video_election_commentary from 'src/assets/video/election_commentary.mp4';
 import { Video, ResizeMode } from 'expo-av';
-import ImageTalks from 'src/assets/news/talks.png';
-import Polling from 'src/assets/news/polling.png';
-import Results from 'src/assets/news/results.png';
-import { ProgressBar, MD3Colors } from 'react-native-paper';
 
-
-import { Audio } from 'expo-av';
-
-type ItemProps = { title: string, timestamp: string, people: string, src: string, key: string };
-
-export function News({ navigation }: any) {
-  useEffect(() => {
-    const call = async () => {
-
-      const perm = await Audio.requestPermissionsAsync();
-      if (perm.status === "granted") {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true
-        });
-      }
-    }
-
-    call();
-  }, []);
-
-  const [news, setNews] = useState([
-    {
-      title: 'Ongoing Electoral Process: Discussion Forum in Luanda Conducted by the National Electoral Commission (CNE)',
-      timestamp: '2h ago',
-      people: '13K',
-      src: ImageTalks,
-      key: '1'
-    },
-    {
-      title: 'Examining the Outdated Practices in Polling Procedures and the Essential Role of Election Observers',
-      timestamp: '1h ago',
-      people: '12K',
-      src: Polling,
-      key: '2'
-    },
-    {
-      title: 'The National Electoral Commission (CNE) Holds Ground: No Intention to Expedite Result Disclosure Deadline',
-      timestamp: '2h ago',
-      people: '13K',
-      src: Results,
-      key: '3'
-    },
-    {
-      title: 'Ongoing Electoral Process: Discussion Forum in Luanda Conducted by the National Electoral Commission (CNE)',
-      timestamp: '2h ago',
-      people: '13K',
-      src: ImageTalks,
-      key: '4'
-    },
-    {
-      title: 'Examining the Outdated Practices in Polling Procedures and the Essential Role of Election Observers',
-      timestamp: '1h ago',
-      people: '12K',
-      src: Polling,
-      key: '5'
-    },
-    {
-      title: 'The National Electoral Commission (CNE) Holds Ground: No Intention to Expedite Result Disclosure Deadline',
-      timestamp: '2h ago',
-      people: '13K',
-      src: Results,
-      key: '6'
-    },
-  ]);
-
-  const { authState } = useAuth();
-  const [activeScreen, setActiveScreen] = useState("Login");
-  const [percentage, setPercentage] = useState<number>();
-
-  useEffect(() => {
-    if (!authState?.authenticated) {
-      setActiveScreen("Login");
-    } else {
-      onPressLoadResultsComputed()
-    }
-
-  }, []);
-
-
-  const onPressLoadResultsComputed = () => {
-    axios.get('/blockchain/get-results-computed')
-      .then(response => {
-        const results = response.data;
-
-        if (results !== undefined) {
-
-          const total_expected: number = parseInt(results.expectedTotalVotes);
-          const total_received: number = parseInt(results.totalVotesReceived);
-          let perc: number = (total_received * 100) / total_expected;
-          perc = Number(perc.toFixed(2));
-
-          setPercentage(perc);
-        }
-      })
-      .catch(error => console.error(error));
-  }
-
-  const video = React.useRef(null);
-  const [status, setStatus] = React.useState({});
-
-
+export default function News() {
   return (
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Header navigation={navigation} />
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Election News</Text>
+        <Text style={styles.subtitle}>Stay updated with the latest election information</Text>
       </View>
-      <View style={styles.containerVideo}>
-
-        <Video
-          ref={video}
-          style={styles.video}
-          source={Video_election_commentary}
-          useNativeControls
-          resizeMode={ResizeMode.CONTAIN}
-          isLooping
-          isMuted={false}
-          onPlaybackStatusUpdate={status => setStatus(() => status)}
-        />
-
+      
+      <View style={styles.newsCard}>
+        <Text style={styles.newsTitle}>Presidential Debate Highlights</Text>
+        <Text style={styles.newsDate}>April 15, 2025</Text>
+        <Text style={styles.newsContent}>
+          The presidential candidates engaged in a heated debate last night, discussing key issues including 
+          economic policies, healthcare reform, and foreign relations. Analysts suggest that Candidate A 
+          performed strongly on economic questions, while Candidate B showed expertise in foreign policy matters.
+        </Text>
+        <TouchableOpacity style={styles.readMoreButton}>
+          <Text style={styles.readMoreText}>Read More</Text>
+        </TouchableOpacity>
       </View>
-      <View style={styles.electionBreakingContainer}>
-        <View style={styles.containerElectionFeed}>
-          <Text style={{ fontSize: 30 }}>Election Feed</Text>
-          <Text>Last update: Sunday, February 18, 2024 (GMT+1)</Text>
-
-          <ProgressBar progress={!percentage ? 0 : percentage / 100} color='grey' style={{height:25}}/>
-
-          <Text style={{ fontSize: 14 }}>{!percentage ? 0 : percentage}% eligible Americans have voted</Text>
-        </View>
-        <View style={styles.containerBreaking}>
-          <Text style={{ fontSize: 30 }}>Breaking News</Text>
-
-          <SafeAreaView>
-            <FlatList
-              data={news}
-              renderItem={({ item }) => <NewsItem title={item.title} timestamp={item.timestamp} people={item.people} src={item.src} />}
-              keyExtractor={item => item.key}
-              showsVerticalScrollIndicator={false}
-            />
-          </SafeAreaView>
-        </View>
+      
+      <View style={styles.newsCard}>
+        <Text style={styles.newsTitle}>Voter Registration Deadline Approaching</Text>
+        <Text style={styles.newsDate}>April 10, 2025</Text>
+        <Text style={styles.newsContent}>
+          The deadline for voter registration is April 30, 2025. All eligible citizens are encouraged to 
+          register through the mobile app or visit their local election office. Remember to bring valid 
+          identification documents when registering in person.
+        </Text>
+        <TouchableOpacity style={styles.readMoreButton}>
+          <Text style={styles.readMoreText}>Read More</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+      
+      <View style={styles.newsCard}>
+        <Text style={styles.newsTitle}>New Polling Locations Announced</Text>
+        <Text style={styles.newsDate}>April 5, 2025</Text>
+        <Text style={styles.newsContent}>
+          The Election Commission has announced several new polling locations to accommodate the increased 
+          number of registered voters. The new locations include community centers, schools, and public 
+          libraries across all districts. Check the app for your assigned polling station.
+        </Text>
+        <TouchableOpacity style={styles.readMoreButton}>
+          <Text style={styles.readMoreText}>Read More</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    width: '100%',
-    height: '100%',
-    flexDirection: 'column',
-    gap: 5
+    backgroundColor: theme.colors.background,
   },
-  containerVideo: {
-    marginTop: 10,
-    margin: 10,
-    backgroundColor: '#d8d8d8',
-    width: '95%',
-    borderRadius: 20,
-    height: 130,
-    justifyContent: 'center',
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  headerContainer: {
-
-  },
-  progressBar: {
-    width: '100%'
-  },
-  containerElectionFeed: {
-
-  },
-  electionBreakingContainer: {
-    backgroundColor: 'transparent',
-    width: '95%'
-  },
-  containerBreaking: {
-
+  header: {
+    padding: 20,
+    backgroundColor: theme.colors.primary,
   },
   title: {
-    color: '#FFF',
-    fontSize: 32,
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 5,
   },
-  item: {
-    backgroundColor: '#f9c2ff',
-    padding: 20,
-    width: '100%',
-    marginVertical: 8,
-    marginHorizontal: 0,
-    justifyContent: 'center',
-    flex: 1
+  subtitle: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.8)',
   },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  }, video: {
-    backgroundColor: '#d8d8d8',
-    width: '100%',
+  newsCard: {
+    backgroundColor: '#fff',
+    margin: 15,
     borderRadius: 10,
-    height: '100%',
-  }
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  newsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginBottom: 5,
+  },
+  newsDate: {
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginBottom: 10,
+  },
+  newsContent: {
+    fontSize: 14,
+    color: theme.colors.text,
+    lineHeight: 20,
+    marginBottom: 15,
+  },
+  readMoreButton: {
+    alignSelf: 'flex-end',
+  },
+  readMoreText: {
+    color: theme.colors.primary,
+    fontWeight: 'bold',
+  },
 });

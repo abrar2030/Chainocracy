@@ -1,53 +1,58 @@
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import AmericaFita from '@assets/angola-flag-colored.png';
+import { StyleSheet, Text, View } from 'react-native';
 
 export function HeaderElection() {
   return (
     <View style={styles.container}>
-      <Image source={AmericaFita} style={styles.image}/>
-      <Text style={styles.textElection}>ELECTION 2027</Text>
-      <Text style={styles.textDate}>May 20th</Text>
+      <View style={styles.flagContainer}>
+        <View style={styles.flagStripe1}></View>
+        <View style={styles.flagStripe2}></View>
+        <View style={styles.flagStripe3}></View>
+      </View>
+      <Text style={styles.title}>Chainocracy</Text>
+      <Text style={styles.subtitle}>Blockchain-based Voting System</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,    
-    backgroundColor: '#868686',
     width: '100%',
-    maxHeight: 120,
-    minHeight: 120,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-    padding: 20,
-    justifyContent: 'center',
+    padding: 15,
+    backgroundColor: '#f8f8f8',
     alignItems: 'center',
-  }, image: {
-    flex: 1,
-    resizeMode: 'cover',
-    width: '120%',
-    height: '130%',
-    position: 'absolute'
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
-  textElection: {
-    color: 'white',
-    fontSize: 30,
-    fontWeight: '700',
-    textAlign: 'center',
-    textAlignVertical: 'center',
-    backgroundColor: 'transparent',
-    height: '80%',
-    paddingTop: 5
-  }, textDate: {
-    color: 'white',
-    fontWeight: '700',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-    backgroundColor: 'transparent',
-    flex: 1,
+  flagContainer: {
+    width: 60,
+    height: 40,
+    marginBottom: 10,
     flexDirection: 'row',
-    alignSelf: 'flex-end'
-  }
+    overflow: 'hidden',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  flagStripe1: {
+    flex: 1,
+    backgroundColor: '#0057B7',
+  },
+  flagStripe2: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  flagStripe3: {
+    flex: 1,
+    backgroundColor: '#D62612',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+  },
 });

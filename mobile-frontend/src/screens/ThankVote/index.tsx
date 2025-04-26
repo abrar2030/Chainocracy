@@ -1,179 +1,137 @@
-import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import theme from 'src/theme';
 import { StatusBar } from 'react-native';
-import wellDoneImg from '@assets/well_done.png';
-import EncryptedImage from '@assets/encrypted.png';
 import * as Clipboard from 'expo-clipboard';
 import { useEffect, useState } from 'react';
 
-type ItemProps = { title: string, timestamp: string, people: string, src: string, key: string };
+export default function ThankVote() {
+  const [copied, setCopied] = useState(false);
+  const transactionId = "tx_123456789abcdef";
 
-export function ThankVote({ navigation, route }: any) {
-    const { data } = route.params;
+  const copyToClipboard = async () => {
+    await Clipboard.setStringAsync(transactionId);
+    setCopied(true);
+  };
 
-    const [code, setCode] = useState("0x94857837593950509c38475924cr323242424");
-    const [copyText, setCopyText] = useState("copy");
-    const [opacity, setOpacity] = useState(1);
-
-    useEffect(() => {
-        setCode(data);
-    }, []);
-
-    useEffect(() => {
-        setTimeout(() => {
-            setCopyText("copy");
-            setOpacity(1);
-        }, 2000);
-    }, [copyText]);
-
-    const onPress = () => {
-        navigation.navigate('News');
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => {
+        setCopied(false);
+      }, 3000);
+      return () => clearTimeout(timer);
     }
+  }, [copied]);
 
-    const onClipBoard = async () => {
-        await Clipboard.setStringAsync(code);
-        setOpacity(0.5);
-        setCopyText("copied");
-    };
-
-    return (
-        <View style={styles.container}>
-            <View style={styles.containerContent}>
-                <Image source={wellDoneImg} style={styles.imgCandidate} />
-                <Text style={styles.thanksPlacing}>Thank you for placing your vote</Text>
-                <Text style={{ textAlign: 'justify', fontSize: 12.7, marginTop: 5, color: 'white' }}>Your vote was encrypted and added successfully to chain.</Text>
-
-                <View style={styles.containerEncrypt}>
-                    <Image source={EncryptedImage} style={styles.imageEncry30} />
-                    <Image source={EncryptedImage} style={styles.imageEncry50} />
-                    <Image source={EncryptedImage} style={styles.imageEncry70} />
-                    <Image source={EncryptedImage} style={styles.imageEncry} />
-                    <Image source={EncryptedImage} style={styles.imageEncry70} />
-                    <Image source={EncryptedImage} style={styles.imageEncry50} />
-                    <Image source={EncryptedImage} style={styles.imageEncry30} />
-                </View>
-
-                <Text style={{ textAlign: 'justify', fontSize: 14, marginTop: 10, color: 'white' }}>Operation identifier | Confirmation code</Text>
-                <View style={{
-                    paddingTop: 10
-                }}>
-
-                    <TouchableOpacity onPress={onClipBoard} style={{ backgroundColor: 'transparent', alignItems: 'flex-end' }}>
-                        <View style={{ backgroundColor: '#3b8150', padding: 4, borderRadius: 6 }}>
-                            <Text style={{ color: '#ffffff', padding: 2, fontSize: 10, fontWeight: '500', opacity: opacity }}>{copyText}</Text>
-                        </View>
-                    </TouchableOpacity>
-
-                    <Text style={{ textAlign: 'justify', fontSize: 9.1, marginTop: 0, color: '#ffffff' }} >{code}</Text>
-                </View>
-
-                <View style={styles.containerLevel}>
-                    <TouchableOpacity style={styles.buttonNotify} onPress={onPress}>
-                        <Text style={styles.textNotify}>Notify me</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.buttonOK} onPress={onPress}>
-                        <Text style={styles.textOK}>OK</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <Text style={styles.title}>Thank You!</Text>
+      <Text style={styles.subtitle}>Your vote has been recorded</Text>
+      
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Transaction Details</Text>
+        <Text style={styles.label}>Transaction ID:</Text>
+        <View style={styles.transactionContainer}>
+          <Text style={styles.transactionId}>{transactionId}</Text>
+          <TouchableOpacity onPress={copyToClipboard} style={styles.copyButton}>
+            <Text style={styles.copyButtonText}>{copied ? "Copied!" : "Copy"}</Text>
+          </TouchableOpacity>
         </View>
-    );
+        <Text style={styles.info}>
+          Your vote has been securely recorded on the blockchain. You can use this 
+          transaction ID to verify your vote at any time.
+        </Text>
+      </View>
+      
+      <TouchableOpacity style={styles.button}>
+        <Text style={styles.buttonText}>Return to Home</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#171717',
-        alignItems: 'center',
-        paddingTop: StatusBar.currentHeight
-    }, containerContent: {
-        backgroundColor: '#339952',
-        marginTop: '40%',
-        height: '100%',
-        width: '100%',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        padding: 30,
-        paddingLeft: 20,
-        paddingRight: 20,
-        alignItems: 'center'
-    }, containerLevel: {
-        width: '100%',
-        paddingTop: 20,
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        paddingBottom: 10,
-        alignSelf: 'flex-end',
-        backgroundColor: 'transparent',
-        gap: 15
-    }, buttonNotify: {
-        width: '75%',
-        alignItems: 'center',
-        backgroundColor: '#ffffff',
-        borderColor: '#fbfbfb',
-        padding: 15,
-        borderWidth: 1,
-        borderRadius: 8,
-        elevation: 60,
-        shadowColor: 'black',
-        shadowOffset: {
-            width: 8,
-            height: 6
-        }
-    }, buttonOK: {
-        width: '75%',
-        alignItems: 'center',
-        backgroundColor: '#202020',
-        borderColor: '#171717',
-        padding: 15,
-        borderWidth: 1,
-        borderRadius: 8,
-        elevation: 55,
-        shadowColor: 'black',
-        shadowOffset: {
-            width: 6,
-            height: 6
-        }
-    }, textNotify: {
-        color: '#1b1b1b',
-        fontSize: 18,
-        textAlign: 'center', // Center the text horizontally
-        textAlignVertical: 'center',
-        fontWeight: '700'
-    }, textOK: {
-        color: '#ffffff',
-        fontSize: 18,
-        textAlign: 'center', // Center the text horizontally
-        textAlignVertical: 'center',
-        fontWeight: '700'
-    }, thanksPlacing: {
-        textAlign: 'center',
-        fontSize: 20,
-        paddingTop: 5,
-        fontWeight: '600',
-        color: 'white'
-    }, imageEncry: {
-        resizeMode: 'contain',
-        width: 50
-    }, imageEncry30: {
-        resizeMode: 'contain',
-        width: 50,
-        opacity: 0.3
-    }, imageEncry50: {
-        resizeMode: 'contain',
-        width: 50,
-        opacity: 0.7
-    }, imageEncry70: {
-        resizeMode: 'contain',
-        width: 50,
-        opacity: 0.8
-    }, containerEncrypt: {
-        flexDirection: 'row',
-        width: '100%',
-        justifyContent: 'center',
-        resizeMode: 'contain'
-    }, imgCandidate: {
-        resizeMode: 'contain',
-        height: 200
-    }
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    padding: 20,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: theme.colors.success,
+    marginTop: 60,
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: theme.colors.textSecondary,
+    marginBottom: 40,
+  },
+  card: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginBottom: 5,
+  },
+  transactionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+  },
+  transactionId: {
+    fontSize: 14,
+    color: theme.colors.text,
+    flex: 1,
+  },
+  copyButton: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  copyButtonText: {
+    color: '#fff',
+    fontSize: 12,
+  },
+  info: {
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    lineHeight: 20,
+  },
+  button: {
+    backgroundColor: theme.colors.primary,
+    width: '100%',
+    height: 50,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
