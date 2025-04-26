@@ -26,8 +26,8 @@ export type User = {
     photo?: string,
     refreshToken?: string,
     timestamp?: string,
-    toast(...params: any[]): void,
-    setData?: any,
+    toast: (...params: any[]) => void,
+    setData: any,
 }
 
 export type Block = {

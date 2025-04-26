@@ -3,11 +3,95 @@ import { useFirebaseStorage, getItemName, getUsername, getSpeech, uploadImage } 
 import { User } from '@/data_types';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 // Mock function to handle image list updates since it's missing from AuthContext
 const mockUpdateImageList = (newImage: string) => {
   console.log("Updating image list with:", newImage);
   // In a real implementation, this would update the image list in the context
+};
+
+interface UserModalProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  defaultValues: User;
+  setData: any;
+  mode: boolean;
+  toast: any;
+}
+
+export const UserModal = ({ isOpen, onOpenChange, defaultValues, setData, mode, toast }: UserModalProps) => {
+  const [name, setName] = useState(defaultValues.name || '');
+  const [username, setUsername] = useState(defaultValues.username || '');
+  const [password, setPassword] = useState(defaultValues.password || '');
+  
+  useEffect(() => {
+    if (isOpen) {
+      setName(defaultValues.name || '');
+      setUsername(defaultValues.username || '');
+      setPassword(defaultValues.password || '');
+    }
+  }, [isOpen, defaultValues]);
+
+  const handleSubmit = () => {
+    // Handle form submission logic here
+    console.log("Submitting user data:", { name, username, password });
+    
+    // Close the modal
+    onOpenChange(false);
+    
+    // Show success toast
+    toast({
+      title: "Success",
+      description: "User information updated successfully",
+    });
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{mode ? "Add New User" : "Edit User"}</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-right">Name</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="username" className="text-right">Username</Label>
+            <Input
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="password" className="text-right">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="col-span-3"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="submit" onClick={handleSubmit}>Save changes</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 const UserOperations = () => {
