@@ -1,6 +1,6 @@
 import { CaretLeft, CheckCircle, UsersFour, WarningCircle } from 'phosphor-react-native'
 import logoImg from '@assets/flag.png';
-import profileImg from '@assets/alfredo_party_75.png';
+import profileImg from '@assets/abrar_party_75.png';
 import fcBarca from '@assets/FC_Barcelona.png';
 import theme from 'src/theme';
 import { Image, StyleSheet, View, Text, TouchableOpacity, SafeAreaView, FlatList, StatusBar } from 'react-native';

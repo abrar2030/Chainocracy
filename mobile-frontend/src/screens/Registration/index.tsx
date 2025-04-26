@@ -191,7 +191,7 @@ export function Registration({ navigation }: any) {
           {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
 
           <Text style={styles.textTitleInput}>E-mail</Text>
-          <TextInput style={styles.textInput} placeholder='Ex.: alfredo.martins@hotmail.com'
+          <TextInput style={styles.textInput} placeholder='Ex.: abrar.martins@hotmail.com'
             onChangeText={text => {
               setEmail(text);
             }}

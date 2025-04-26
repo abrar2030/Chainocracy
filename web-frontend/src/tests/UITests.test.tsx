@@ -256,7 +256,7 @@ describe('Users component', () => {
         })).toBeInTheDocument();
 
         expect(screen.queryByText((content, element) => {
-            return element.tagName.toLowerCase() === 'td' && content.includes('alfredo.martins');
+            return element.tagName.toLowerCase() === 'td' && content.includes('abrar.ahmed');
         })).toBeInTheDocument();
 
     });

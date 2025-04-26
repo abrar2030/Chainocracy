@@ -23,7 +23,7 @@ Project Structure
 Each part of the project is structured as an individual code base, however, we merged everything in this repository, and we can clone it.
 
 Repository Links:
-- `Full code-base <https://github.com/AlfredoMartins/blockchain-angola.git>`_
+- `Full code-base <https://github.com/abrar2030/chainocracy.git>`_
 
 Cloning the Repositories
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -32,7 +32,7 @@ To clone the repositories to your local development environment, open your termi
 
 .. code-block:: bash
 
-   $ git clone https://github.com/AlfredoMartins/blockchain-angola.git
+   $ git clone https://github.com/abrar2030/chainocracy.git
    > Cloning into `Spoon-Knife`...
    > remote: Counting objects: 10, done.
    > remote: Compressing objects: 100% (8/8), done.

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Image, StyleSheet, Text, View } from 'react-native';
-import profileImg from '@assets/alfredo_party_50.png';
+import profileImg from '@assets/abrar_party_50.png';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Progress from 'react-native-progress';
 import axios from 'axios';

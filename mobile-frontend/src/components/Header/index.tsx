@@ -1,6 +1,6 @@
 import { SignOut, UserFocus, WarningCircle } from 'phosphor-react-native'
 import logoImg from '@assets/logo.png';
-import profileImg from '@assets/alfredo_party_50.png';
+import profileImg from '@assets/abrar_party_50.png';
 import theme from 'src/theme';
 import { Image, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useAuth } from 'src/context/AuthContext';

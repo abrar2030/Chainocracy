@@ -190,7 +190,7 @@ describe('Users component', () => {
             return element.tagName.toLowerCase() === 'td' && content.includes('Abrar Ahmed');
         })).toBeInTheDocument();
         expect(screen.queryByText((content, element) => {
-            return element.tagName.toLowerCase() === 'td' && content.includes('alfredo.martins');
+            return element.tagName.toLowerCase() === 'td' && content.includes('abrar.ahmed');
         })).toBeInTheDocument();
     });
     it('Opens add user modal when "Add User" button is clicked', async () => {

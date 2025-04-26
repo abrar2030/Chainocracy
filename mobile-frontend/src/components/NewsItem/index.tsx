@@ -1,6 +1,6 @@
 import { CaretLeft, UsersFour, WarningCircle } from 'phosphor-react-native'
 import logoImg from '@assets/flag.png';
-import profileImg from '@assets/alfredo_party_60.png';
+import profileImg from '@assets/abrar_party_60.png';
 import theme from 'src/theme';
 import { Image, StyleSheet, View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';

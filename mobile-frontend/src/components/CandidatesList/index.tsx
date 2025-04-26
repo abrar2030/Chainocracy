@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-import profileImg from '@assets/alfredo_party_50.png';
+import profileImg from '@assets/abrar_party_50.png';
 import { CandidateItem } from '@components/CandidateItem';
 import { useAuth } from 'src/context/AuthContext';
 

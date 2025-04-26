@@ -10,7 +10,7 @@ printHeader(){
     clear
     now=`date`
     echo "======================================================================"
-    echo "Made by: MARTINS Alfredo | ELTE, Budapest $now"
+    echo "Made by: Ahmed Abrar | ELTE, Budapest $now"
     echo "======================================================================"
     echo ":: WELCOME TO THE ELECTION DATA CENTER ::"
     echo "OPTIONS:"
@@ -120,7 +120,7 @@ printfInvalidOperation(){
 dismiss(){
     echo "Network shut down :). Any further requests will be denied ..."
     echo "THANK YOU FOR USING MY SCRIPT :) $(date)"
-    echo "Copyright© ELTE 2024, MARTINS Alfredo"
+    echo "Copyright© ELTE 2024, Ahmed Abrar"
     exit 0
 }
 

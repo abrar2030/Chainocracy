@@ -152,7 +152,7 @@ To check whether the login was successful:
 
    eas whoami
    # Sample output
-   alfredomartins
+   abrarahmed
 
 Configure the project
 ---------------------

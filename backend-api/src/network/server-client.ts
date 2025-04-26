@@ -279,7 +279,7 @@ const printHeader = (): void => {
   console.clear();
   const now = new Date().toUTCString();
   let text = "=======================================================================\n";
-  text += `Made by: MARTINS Alfredo | ELTE, Budapest ${now}\n`;
+  text += `Made by: Ahmed Abrar | ELTE, Budapest ${now}\n`;
   text += "=======================================================================\n";
   text += ":: WELCOME TO THE ELECTION DATA CENTER ::\n";
   text += "OPTIONS:\n";
@@ -354,7 +354,7 @@ const printfInvalidOperation = (): void => {
 const dismiss = (): void => {
   console.log("Network shut down :). Any further requests will be denied ...");
   console.log(`THANK YOU FOR USING MY SCRIPT :) ${new Date()}`);
-  console.log("Copyright© ELTE 2024, MARTINS Alfredo");
+  console.log("Copyright© ELTE 2024, Ahmed Abrar");
 
   setTimeout(serverDisplay, 2000); // Wait for 2 seconds before listing nodes
 };
