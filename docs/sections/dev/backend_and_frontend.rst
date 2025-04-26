@@ -241,7 +241,7 @@ Remember that a profile can be named whatever you like. In the above example, it
 
 In this particular thesis, we worked with the build of iOS simulator to speed our process up.
 
-One can also check the multiple builds on the Expo project page `source <https://expo.dev/accounts/CodeTyper/projects/election-blockchain-angola/builds>`_
+One can also check the multiple builds on the Expo project page `source <https://expo.dev/accounts/CodeTyper/projects/election-chainocracy/builds>`_
 
 .. image:: ../../images/build/builds.png
    :alt: Android and iOS Builds
