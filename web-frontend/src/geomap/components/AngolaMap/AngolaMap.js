@@ -1,18 +1,18 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import useCoffeeDataAngola from '../../hooks/useCoffeeDataAngola';
-import './AngolaMap.scss';
+import useCoffeeDataamerica from '../../hooks/useCoffeeDataamerica';
+import './americaMap.scss';
 import { useEffect, useMemo, useRef, useState, } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Tooltip from '../Tooltip/Tooltip';
-export default function AngolaMap() {
+export default function americaMap() {
     const tooltip = useRef(null);
     const [tooltipContent, setTooltipContent] = useState(null);
     const [mapProvincies, setMapProvincies] = useState([]);
     const { mapData, partiesData } = useAuth();
     const width = 400;
     const height = 400;
-    const { constructProvincies, isMatchCoffeeRegion, getRegionColor, getRegionHoverColor, } = useCoffeeDataAngola();
+    const { constructProvincies, isMatchCoffeeRegion, getRegionColor, getRegionHoverColor, } = useCoffeeDataamerica();
     const mapSize = useMemo(() => {
         return [
             (width) || 0,
@@ -69,7 +69,7 @@ export default function AngolaMap() {
         const initialmapProvincies = constructProvincies(mapSize);
         setMapProvincies(initialmapProvincies);
     }, [constructProvincies, mapSize]);
-    return (_jsxs("div", { className: "AngolaMap", children: [_jsx("div", { ref: tooltip, style: { position: 'absolute', display: 'none' }, children: _jsx(Tooltip, { children: tooltipContent }) }), _jsx("svg", { className: "AngolaMap--svg", width: mapSize[0], height: mapSize[1], stroke: 'black', children: mapProvincies && mapProvincies.map(provincy => {
+    return (_jsxs("div", { className: "americaMap", children: [_jsx("div", { ref: tooltip, style: { position: 'absolute', display: 'none' }, children: _jsx(Tooltip, { children: tooltipContent }) }), _jsx("svg", { className: "americaMap--svg", width: mapSize[0], height: mapSize[1], stroke: 'black', children: mapProvincies && mapProvincies.map(provincy => {
                     return (_jsx("path", { id: provincy.OBJECTID.toString(), ...provincy.svg, onMouseMove: (e) => handleMouseOverCountry(e, provincy), onMouseLeave: () => handleMouseLeaveCountry(), stroke: 'white', strokeWidth: 0.5 }, provincy.Nome_Prov_));
                 }) })] }));
 }

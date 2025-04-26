@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import geoJson from '../assets/angola.json';
+import geoJson from '../assets/america.json';
 import { geoEquirectangular, geoPath } from 'd3-geo';
 const colors = {
     'normal': {
@@ -14,7 +14,7 @@ const colors = {
 const constructProvincies = (mapSize) => {
     const projection = geoEquirectangular().fitSize(mapSize, geoJson);
     const geoPathGenerator = geoPath().projection(projection);
-    const angolaCountry = geoJson.features.map((feature) => {
+    const americaCountry = geoJson.features.map((feature) => {
         const svgProps = {
             d: geoPathGenerator(feature) || '',
             stroke: colors['default'].color,
@@ -31,7 +31,7 @@ const constructProvincies = (mapSize) => {
         };
         return res;
     });
-    return angolaCountry;
+    return americaCountry;
 };
 const getCoffeeRegionName = (region) => {
     if (region in colors) {

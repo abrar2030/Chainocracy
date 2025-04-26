@@ -291,7 +291,7 @@ Assuming Docker is already running on the machine, build the image by running th
 .. code-block:: bash
 
    # docker build -t <image_name> <directory_path>
-   $ docker build -t api_angola .
+   $ docker build -t api_america .
 
 Sample Output
 ~~~~~~~~~~~~~
@@ -313,7 +313,7 @@ Sample Output
     => exporting to image
     => => exporting layers
     => => writing image sha256: ...
-    => => naming to docker.io/library/api_angola
+    => => naming to docker.io/library/api_america
 
 The ``-t`` flag allows us to specify a desired name for the image being built.
 
@@ -325,7 +325,7 @@ With the image created, you can create and run a container using the following c
 .. code-block:: bash
 
    # docker run -e SERVER_PORT=<port_number> --name <container_name> <image_name>
-   $ docker run -e SERVER_PORT=3010 --name container_1 api_angola
+   $ docker run -e SERVER_PORT=3010 --name container_1 api_america
 
 Sample Output
 ~~~~~~~~~~~~~

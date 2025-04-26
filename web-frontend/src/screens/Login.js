@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { LoginAccountCard } from '@/components/login-account-card';
 import { useAuth } from '@/context/AuthContext';
 import { useEffect } from 'react';
-import AmericaIcon from '../assets/angolaIcon.svg';
+import AmericaIcon from '../assets/americaIcon.svg';
 function Login() {
     const { onLogOut } = useAuth();
     useEffect(() => {

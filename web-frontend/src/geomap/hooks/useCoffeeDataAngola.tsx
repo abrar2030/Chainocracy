@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import geoJson from '../assets/angola.json';
+import geoJson from '../assets/america.json';
 import { geoEquirectangular, geoPath } from 'd3-geo';
 import { SVGProps } from 'react';
 
@@ -42,7 +42,7 @@ const constructProvincies = (mapSize: [number, number]): IMapProvincy[] => {
   const projection = geoEquirectangular().fitSize(mapSize, geoJson as any);
   const geoPathGenerator = geoPath().projection(projection);
 
-  const angolaCountry = geoJson.features.map((feature: any) => {
+  const americaCountry = geoJson.features.map((feature: any) => {
     
     const svgProps: SVGProps<SVGPathElement> = {
       d: geoPathGenerator(feature as any) || '',
@@ -63,7 +63,7 @@ const constructProvincies = (mapSize: [number, number]): IMapProvincy[] => {
     return res;
   });
 
-  return angolaCountry;
+  return americaCountry;
 }
 
 const getCoffeeRegionName = (region: string) => {
@@ -86,7 +86,7 @@ const isMatchCoffeeRegion = (source: IMapProvincy, target: IMapProvincy) => {
   return source.Nome_Prov_ === target.Nome_Prov_;
 }
 
-const useCoffeeDataAngola = () => {
+const useCoffeeDataamerica = () => {
 
   return {
     constructProvincies,
@@ -97,4 +97,4 @@ const useCoffeeDataAngola = () => {
   };
 }
 
-export default useCoffeeDataAngola;
+export default useCoffeeDataamerica;

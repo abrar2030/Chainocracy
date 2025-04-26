@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import useCoffeeDataAngola, { IMapProvincy } from '../../hooks/useCoffeeDataAngola';
+import useCoffeeDataamerica, { IMapProvincy } from '../../hooks/useCoffeeDataamerica';
 
-import './AngolaMap.scss';
+import './americaMap.scss';
 import {
   ReactNode,
   useEffect,
@@ -12,7 +12,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import Tooltip from '../Tooltip/Tooltip';
 
-export default function AngolaMap() {
+export default function americaMap() {
 
   const tooltip = useRef<HTMLDivElement>(null);
   const [tooltipContent, setTooltipContent] = useState<ReactNode>(null);
@@ -27,7 +27,7 @@ export default function AngolaMap() {
     isMatchCoffeeRegion,
     getRegionColor,
     getRegionHoverColor,
-  } = useCoffeeDataAngola();
+  } = useCoffeeDataamerica();
   
   const mapSize: [number, number] = useMemo(() => {
     return [
@@ -119,7 +119,7 @@ export default function AngolaMap() {
   }, [constructProvincies, mapSize]);
 
   return (
-    <div className="AngolaMap">
+    <div className="americaMap">
 
       <div ref={tooltip} style={{ position: 'absolute', display: 'none' }}>
         <Tooltip>
@@ -128,7 +128,7 @@ export default function AngolaMap() {
       </div>
 
       <svg
-        className="AngolaMap--svg"
+        className="americaMap--svg"
         width={mapSize[0]}
         height={mapSize[1]}
         stroke='black'
