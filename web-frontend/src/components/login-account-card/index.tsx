@@ -38,7 +38,7 @@ export function LoginAccountCard() {
     const navigate = useNavigate();
 
     const formValidation = () => {
-        let errorHash: ErrorHash = {};
+        const errorHash: ErrorHash = {};
 
         if (!username) errorHash.username = "Username required.";
         if (!password) errorHash.password = "Password required.";

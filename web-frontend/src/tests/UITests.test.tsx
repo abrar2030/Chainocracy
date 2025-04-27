@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+ 
 import 'resize-observer-polyfill';
 import { fireEvent, render, screen } from '@testing-library/react';
 import Login from '@/screens/Login';

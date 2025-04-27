@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { CandidateResult, Results } from "@/data_types";
 
-/* eslint-disable @typescript-eslint/no-var-requires */
+ 
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+ 
 
 import CardCandidates from '@/components/card-candidates/page';
 import SoundButton from '@/tables/election_results_table/SoundButton';

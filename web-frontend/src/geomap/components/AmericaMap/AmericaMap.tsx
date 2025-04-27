@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import useCoffeeDataAmerica, { IMapProvincy } from '../../hooks/useCoffeeDataAmerica';
 
 import './AmericaMap.scss';

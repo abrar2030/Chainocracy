@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { GLOBAL_VARIABLES } from "@/global/globalVariables";
 import { columns } from "./columns";
 

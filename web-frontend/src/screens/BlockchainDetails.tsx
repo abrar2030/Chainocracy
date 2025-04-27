@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import BlockList from '@/components/blockchain-list/BlockList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import JsonEditor from '@/components/json-editor/JsonEditor';
