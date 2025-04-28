@@ -1,0 +1,24 @@
+---
+# Tasks for the backend role
+# Since the backend runs on ECS Fargate managed by Terraform,
+# Ansible tasks here might focus on deployment steps within a CI/CD pipeline
+# or managing related resources not covered by Terraform.
+
+- name: Placeholder for backend deployment tasks
+  ansible.builtin.debug:
+    msg: "Ansible tasks for backend deployment/management would go here (e.g., triggering ECS deployment, database migrations)."
+
+# Example: Trigger ECS service update (requires AWS CLI configured or credentials)
+# - name: Update ECS Service with new task definition
+#   community.aws.ecs_service:
+#     state: present
+#     name: "{{ env }}-chainocracy-backend-service"
+#     cluster: "{{ env }}-chainocracy-backend-cluster"
+#     task_definition: "{{ env }}-chainocracy-backend:{{ new_task_definition_revision }}" # Variable needs to be passed
+#     desired_count: "{{ backend_desired_count | default(2) }}"
+#     deployment_configuration:
+#       minimum_healthy_percent: 50
+#       maximum_percent: 200
+#   become: no # Assuming AWS credentials are handled by the runner
+#   when: new_task_definition_revision is defined
+

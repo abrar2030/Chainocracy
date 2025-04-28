@@ -1,0 +1,37 @@
+# Placeholder Ansible hosts file
+# Note: The Terraform setup uses AWS ECS Fargate for the backend and S3/CloudFront for the frontend.
+# Ansible is typically used for configuring EC2 instances. If EC2 were used, you would replace
+# the placeholders below with actual IP addresses or DNS names obtained from Terraform outputs.
+# For the current Fargate/S3 setup, Ansible's role might shift towards CI/CD orchestration,
+# managing auxiliary resources (like bastion hosts), or database migrations rather than direct server config.
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+# Add common variables here, e.g., application versions, paths
+
+# --- Development Environment --- #
+[dev_servers]
+# dev-backend-server ansible_host=192.0.2.10 ansible_user=ubuntu
+# dev-frontend-server ansible_host=192.0.2.20 ansible_user=ubuntu
+
+[dev_servers:vars]
+env=dev
+
+# --- Production Environment --- #
+[prod_servers]
+# prod-backend-server-1 ansible_host=198.51.100.10 ansible_user=ubuntu
+# prod-backend-server-2 ansible_host=198.51.100.11 ansible_user=ubuntu
+# prod-frontend-server ansible_host=198.51.100.20 ansible_user=ubuntu
+
+[prod_servers:vars]
+env=prod
+
+# --- Groupings (Example) --- #
+[backend_servers:children]
+# dev_servers # Assuming backend runs on these dev servers if using EC2
+# prod_servers # Assuming backend runs on these prod servers if using EC2
+
+[frontend_servers:children]
+# dev_servers # Assuming frontend runs on these dev servers if using EC2
+# prod_servers # Assuming frontend runs on these prod servers if using EC2
+

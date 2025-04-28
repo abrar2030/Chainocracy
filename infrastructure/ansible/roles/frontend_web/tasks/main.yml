@@ -1,0 +1,52 @@
+---
+# Tasks for the frontend_web role
+# Since the frontend is deployed to S3/CloudFront managed by Terraform,
+# Ansible tasks here would typically run within a CI/CD pipeline on a build agent.
+
+- name: Placeholder for frontend build and deployment tasks
+  ansible.builtin.debug:
+    msg: "Ansible tasks for frontend build and S3 sync would go here."
+
+# Example tasks that might run on a build agent:
+# - name: Ensure build directory exists
+#   ansible.builtin.file:
+#     path: "{{ build_dir }}/web-frontend/dist"
+#     state: directory
+#   delegate_to: localhost
+#   become: no
+
+# - name: Install frontend dependencies
+#   community.general.npm:
+#     path: "{{ build_dir }}/web-frontend"
+#     ci: yes # Use 'npm ci' for faster, reliable builds
+#   delegate_to: localhost
+#   become: no
+
+# - name: Build frontend application
+#   community.general.npm:
+#     path: "{{ build_dir }}/web-frontend"
+#     script: build
+#   environment:
+#     # Pass necessary build-time environment variables
+#     VITE_API_URL: "{{ backend_api_url }}"
+#   delegate_to: localhost
+#   become: no
+
+# - name: Sync build artifacts to S3 bucket
+#   community.aws.aws_s3:
+#     bucket: "{{ frontend_s3_bucket_id }}" # Variable from Terraform output or inventory
+#     src: "{{ build_dir }}/web-frontend/dist/"
+#     dest: "/"
+#     mode: sync
+#     permission: public-read # Or use OAI
+#   delegate_to: localhost
+#   become: no
+
+# - name: Invalidate CloudFront cache
+#   community.aws.cloudfront_invalidation:
+#     distribution_id: "{{ frontend_cloudfront_distribution_id }}" # Variable from Terraform output or inventory
+#     paths:
+#       - "/*"
+#   delegate_to: localhost
+#   become: no
+

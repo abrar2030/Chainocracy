@@ -1,0 +1,49 @@
+---
+# Main Ansible playbook (site.yml)
+# This playbook orchestrates tasks across different host groups.
+# Given the Terraform setup (ECS Fargate, S3/CloudFront), this playbook
+# might be more focused on CI/CD steps or managing auxiliary hosts (e.g., bastion).
+
+# Example Playbook Structure:
+
+# - name: Apply common configuration to all relevant hosts (e.g., build agents, bastion)
+#   hosts: all # Or specific groups like build_agents, bastion_hosts
+#   roles:
+#     - common
+
+# - name: Deploy Backend (e.g., trigger ECS update via CI/CD pipeline)
+#   hosts: localhost # Or build_agents
+#   gather_facts: no
+#   roles:
+#     - role: backend
+#       vars:
+#         new_task_definition_revision: "{{ lookup("env", "NEW_TASK_REVISION") }}" # Example: Get revision from env var
+#   tags:
+#     - deploy-backend
+
+# - name: Build and Deploy Frontend (e.g., build, sync to S3, invalidate CloudFront via CI/CD)
+#   hosts: localhost # Or build_agents
+#   gather_facts: no
+#   vars:
+#     build_dir: "/path/to/checkout/on/build/agent"
+#     frontend_s3_bucket_id: "{{ lookup("env", "FRONTEND_S3_BUCKET") }}"
+#     frontend_cloudfront_distribution_id: "{{ lookup("env", "FRONTEND_CF_DIST_ID") }}"
+#     backend_api_url: "{{ lookup("env", "BACKEND_API_URL") }}"
+#   roles:
+#     - role: frontend_web
+#   tags:
+#     - deploy-frontend
+
+- name: Placeholder Playbook
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Display information about Ansible usage
+      ansible.builtin.debug:
+        msg:
+          - "This is a placeholder Ansible playbook."
+          - "With ECS Fargate and S3/CloudFront managed by Terraform, Ansible is typically used within a CI/CD pipeline."
+          - "Roles 'backend' and 'frontend_web' contain example tasks for deployment steps (e.g., triggering ECS updates, building/syncing frontend assets)."
+          - "The 'common' role contains tasks for setting up build agents or bastion hosts if needed."
+          - "Update the 'hosts' file and this playbook based on your specific CI/CD workflow and any auxiliary hosts."
+

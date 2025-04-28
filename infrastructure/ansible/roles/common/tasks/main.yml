@@ -1,0 +1,136 @@
+---
+# Tasks for the common role
+# These tasks would typically run on EC2 instances (e.g., bastion, build servers)
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  become: yes
+
+- name: Install common packages
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - python3-pip
+      - virtualenv
+      - python3-setuptools
+      - git
+      - unzip
+      - jq
+    state: present
+  become: yes
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+  become: yes
+
+# --- Docker Installation (Example if needed on build/bastion hosts) --- #
+- name: Add Docker GPG key
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  become: yes
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    state: present
+  become: yes
+
+- name: Install Docker Engine
+  ansible.builtin.apt:
+    name: "docker-ce={{ docker_version }}*"
+    state: present
+    update_cache: yes
+  become: yes
+  notify: Restart docker
+
+- name: Ensure Docker service is started and enabled
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Add user to docker group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+  become: yes
+
+# --- Node.js Installation (Example if needed on build servers) --- #
+- name: Add NodeSource GPG key
+  ansible.builtin.apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+    state: present
+  become: yes
+
+- name: Add NodeSource repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://deb.nodesource.com/node_{{ node_version }} {{ ansible_distribution_release }} main"
+    state: present
+    update_cache: yes
+  become: yes
+
+- name: Install Node.js
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+  become: yes
+
+# --- Swap File (Optional) --- #
+- name: Check if swap file exists
+  ansible.builtin.stat:
+    path: /swapfile
+  register: swap_file_check
+  when: create_swap
+
+- name: Create swap file
+  ansible.builtin.command:
+    cmd: fallocate -l {{ swap_size_mb }}M /swapfile
+  become: yes
+  when:
+    - create_swap
+    - not swap_file_check.stat.exists
+
+- name: Set swap file permissions
+  ansible.builtin.file:
+    path: /swapfile
+    mode: '0600'
+  become: yes
+  when:
+    - create_swap
+    - not swap_file_check.stat.exists
+
+- name: Make swap file
+  ansible.builtin.command:
+    cmd: mkswap /swapfile
+  become: yes
+  when:
+    - create_swap
+    - not swap_file_check.stat.exists
+
+- name: Enable swap file
+  ansible.builtin.command:
+    cmd: swapon /swapfile
+  become: yes
+  when:
+    - create_swap
+    - not swap_file_check.stat.exists
+
+- name: Add swap file to /etc/fstab
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: /swapfile none swap sw 0 0
+    create: yes
+  become: yes
+  when:
+    - create_swap
+    - not swap_file_check.stat.exists
+

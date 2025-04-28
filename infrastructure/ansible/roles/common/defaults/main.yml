@@ -1,0 +1,7 @@
+---
+# Common role default variables
+docker_version: "24.0.5"
+node_version: "21.x"
+timezone: "UTC"
+create_swap: true
+swap_size_mb: 2048
