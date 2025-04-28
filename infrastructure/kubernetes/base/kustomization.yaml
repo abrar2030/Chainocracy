@@ -1,0 +1,26 @@
+# kustomization.yaml for base Kubernetes manifests
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: chainocracy
+
+resources:
+- namespace.yaml
+- backend-deployment.yaml
+- backend-service.yaml
+- backend-ingress.yaml
+- frontend-web-deployment.yaml # Include if deploying frontend via K8s
+- frontend-web-service.yaml    # Include if deploying frontend via K8s
+- frontend-web-ingress.yaml   # Include if deploying frontend via K8s
+
+# Common labels to add to all resources
+commonLabels:
+  project: chainocracy
+
+# Example: Add a ConfigMap (can be defined here or in overlays)
+# configMapGenerator:
+# - name: backend-config-base
+#   literals:
+#     - LOG_LEVEL=info
+

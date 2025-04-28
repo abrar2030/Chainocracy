@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 2 # Increase replicas for dev environment
+  template:
+    spec:
+      containers:
+      - name: backend
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1024Mi"
+        env:
+        - name: NODE_ENV
+          value: "development"
+        - name: LOG_LEVEL
+          value: "debug"

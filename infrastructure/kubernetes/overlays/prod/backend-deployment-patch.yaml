@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 3 # Increase replicas for production environment
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: "25%"
+      maxUnavailable: "25%"
+  template:
+    spec:
+      containers:
+      - name: backend
+        resources:
+          # Set higher resource requests and limits for production
+          requests:
+            cpu: "500m"
+            memory: "1024Mi"
+          limits:
+            cpu: "1000m"
+            memory: "2048Mi"
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: LOG_LEVEL
+          value: "warn"
+        # Add production-specific environment variables (use Secrets/ConfigMaps)
+        # Example:
+        # - name: DATABASE_URL
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: backend-secrets-prod
+        #       key: database_url

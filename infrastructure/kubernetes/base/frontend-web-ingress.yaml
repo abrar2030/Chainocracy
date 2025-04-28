@@ -1,0 +1,26 @@
+# Note: This ingress corresponds to the frontend-web-deployment if run in K8s.
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend-web-ingress
+  annotations:
+    # Use appropriate annotations for your Ingress controller
+    # nginx.ingress.kubernetes.io/rewrite-target: /
+    # kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: / # Serve frontend from the root path
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-web-service
+            port:
+              number: 80 # Match the Service port
+  # tls:
+  # - hosts:
+  #   - chainocracy-dev.example.com # Replace with actual domain
+  #   secretName: chainocracy-tls-secret # Secret containing TLS cert
+

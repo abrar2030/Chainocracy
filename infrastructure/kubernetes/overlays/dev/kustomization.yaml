@@ -1,0 +1,37 @@
+# kustomization.yaml for dev overlay
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Inherit from the base configuration
+resources:
+- ../../base
+
+namespace: chainocracy # Ensure namespace is set (can also be set in base)
+
+# Environment-specific patches or configurations
+patchesStrategicMerge:
+- backend-deployment-patch.yaml
+- frontend-web-deployment-patch.yaml # Include if deploying frontend via K8s
+- backend-ingress-patch.yaml
+- frontend-web-ingress-patch.yaml # Include if deploying frontend via K8s
+
+# Add environment-specific labels
+commonLabels:
+  environment: dev
+
+# Example: Override image tags for dev
+images:
+- name: placeholder-registry/chainocracy-backend
+  newTag: dev-latest
+- name: placeholder-registry/chainocracy-frontend-web
+  newTag: dev-latest
+
+# Example: Add a dev-specific ConfigMap
+# configMapGenerator:
+# - name: backend-config-dev
+#   behavior: merge # Merge with base configmap if exists
+#   literals:
+#     - LOG_LEVEL=debug
+#     - API_BASE_URL=http://dev-api.example.com
+

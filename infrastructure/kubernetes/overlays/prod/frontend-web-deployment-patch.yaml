@@ -1,0 +1,30 @@
+# Patch for frontend-web deployment in production environment
+# Only include this if deploying frontend via K8s
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-web-deployment
+spec:
+  replicas: 2 # Production replica count for frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: "25%"
+      maxUnavailable: "25%"
+  template:
+    spec:
+      containers:
+      - name: frontend-web
+        resources:
+          # Set higher resource requests and limits for production
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "400m"
+            memory: "512Mi"
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: VITE_API_URL
+          value: "/api" # Assuming ingress routes /api to backend

@@ -1,0 +1,25 @@
+# Patch for backend ingress in dev environment
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-ingress
+  annotations:
+    # Add dev-specific annotations if needed
+    # Example: Use a different ingress class or settings for dev
+    # kubernetes.io/ingress.class: "nginx-dev"
+spec:
+  rules:
+  - host: chainocracy-dev.example.com # Replace with actual dev domain
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - chainocracy-dev.example.com # Replace with actual dev domain
+    secretName: chainocracy-dev-tls-secret # Use a dev-specific TLS secret

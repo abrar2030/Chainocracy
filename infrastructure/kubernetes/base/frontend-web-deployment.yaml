@@ -1,0 +1,44 @@
+# Note: The primary deployment strategy for the web frontend in the Terraform setup
+# is S3 + CloudFront. The following Kubernetes manifests are provided as an
+# alternative or supplementary example if you choose to run the frontend containerized
+# in Kubernetes instead of, or alongside, the S3 deployment.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-web-deployment
+  labels:
+    app: chainocracy-frontend-web
+spec:
+  replicas: 1 # Base replica count, override in overlays
+  selector:
+    matchLabels:
+      app: chainocracy-frontend-web
+  template:
+    metadata:
+      labels:
+        app: chainocracy-frontend-web
+    spec:
+      containers:
+      - name: frontend-web
+        image: placeholder-registry/chainocracy-frontend-web:latest # Placeholder image
+        ports:
+        - containerPort: 80 # Assuming the container serves on port 80 (e.g., via Nginx)
+        env:
+        # Example: Pass backend API URL (can be set via ConfigMap/Overlay)
+        - name: VITE_API_URL
+          value: "http://backend-service/api" # Internal K8s service name
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "250m"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: / # Check root path
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+

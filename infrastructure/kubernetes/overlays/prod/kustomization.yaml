@@ -1,0 +1,43 @@
+# kustomization.yaml for prod overlay
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Inherit from the base configuration
+resources:
+- ../../base
+
+namespace: chainocracy # Ensure namespace is set
+
+# Environment-specific patches or configurations
+patchesStrategicMerge:
+- backend-deployment-patch.yaml
+- frontend-web-deployment-patch.yaml # Include if deploying frontend via K8s
+- backend-ingress-patch.yaml
+- frontend-web-ingress-patch.yaml # Include if deploying frontend via K8s
+
+# Add environment-specific labels
+commonLabels:
+  environment: prod
+
+# Override image tags for prod (use specific version tags)
+images:
+- name: placeholder-registry/chainocracy-backend
+  newTag: v1.0.0 # Replace with actual production tag
+- name: placeholder-registry/chainocracy-frontend-web
+  newTag: v1.0.0 # Replace with actual production tag
+
+# Example: Add production secrets (use sealed secrets or similar mechanism)
+# secrets:
+# - name: backend-secrets-prod
+#   files:
+#     - secrets/db_password.txt
+
+# Example: Add production ConfigMap
+# configMapGenerator:
+# - name: backend-config-prod
+#   behavior: merge
+#   literals:
+#     - LOG_LEVEL=warn
+#     - API_BASE_URL=https://api.chainocracy.example.com # Replace with actual prod API domain
+

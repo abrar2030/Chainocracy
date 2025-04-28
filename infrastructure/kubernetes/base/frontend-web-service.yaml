@@ -1,0 +1,17 @@
+# Note: This service corresponds to the frontend-web-deployment if run in K8s.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-web-service
+  labels:
+    app: chainocracy-frontend-web
+spec:
+  selector:
+    app: chainocracy-frontend-web
+  ports:
+    - protocol: TCP
+      port: 80 # Service port
+      targetPort: 80 # Container port (assuming Nginx/container serves on 80)
+  type: ClusterIP
+
