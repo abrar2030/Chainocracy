@@ -1,0 +1,58 @@
+# Docker Compose file for local development of Chainocracy
+# This file defines the services based on the Dockerfiles created.
+
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ../../Chainocracy_project # Context is the root project directory
+      dockerfile: ../Chainocracy_iac/docker/backend.Dockerfile # Path to the backend Dockerfile relative to context
+    container_name: chainocracy-backend-dev
+    ports:
+      - "3000:3000" # Expose backend port
+    volumes:
+      # Mount source code for live reloading during development
+      # Note: node_modules is excluded using a named volume to prevent overwriting container modules
+      - ../../Chainocracy_project/backend-api:/usr/app
+      - backend_node_modules:/usr/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NODE_PORT=3000
+      - SERVER_PORT=3002
+      # Add other necessary development environment variables
+      # - DATABASE_URL=...
+    # Use nodemon or similar for auto-restarting on code changes
+    # command: npm run dev # Assuming a dev script exists in package.json
+    command: node build/network.js 3002 # Default command if no dev script
+
+  frontend:
+    build:
+      context: ../../ # Context is the parent of Chainocracy_project and Chainocracy_iac
+      dockerfile: Chainocracy_iac/docker/frontend-web.Dockerfile # Path to frontend Dockerfile relative to context
+      args:
+        # Pass API URL for local development (proxied through frontend container or direct)
+        VITE_API_URL: http://localhost:3000/api # Or use Nginx proxy below
+    container_name: chainocracy-frontend-dev
+    ports:
+      - "8080:80" # Expose frontend Nginx port (e.g., access via http://localhost:8080)
+    volumes:
+      # Mount source code for live reloading (if using Vite dev server)
+      # If using Nginx serving static build, volume mount is less useful unless rebuilding often
+      - ../../Chainocracy_project/web-frontend:/app # Mount source if needed for dev server
+      - frontend_node_modules:/app/node_modules # Exclude node_modules
+    depends_on:
+      - backend # Ensure backend starts before frontend (useful if frontend calls backend on start)
+    # environment:
+      # Add frontend specific env vars if needed
+
+volumes:
+  backend_node_modules:
+  frontend_node_modules:
+
+# Note:
+# - This setup assumes you run `docker-compose up` from the `Chainocracy_iac/docker` directory or specify the compose file path.
+# - For frontend live reload with Vite, you might need a different Dockerfile/command that runs `npm run dev` instead of Nginx.
+# - The current frontend Dockerfile builds static assets and serves via Nginx.
+# - Adjust VITE_API_URL based on how you handle API calls in development (direct to backend port or via proxy).
+
