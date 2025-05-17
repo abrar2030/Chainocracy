@@ -1,49 +1,20 @@
-import { Header } from '@components/Header';
-import { TextT, Video } from 'phosphor-react-native';
-import { StyleSheet, View, Text, FlatList, SafeAreaView, TextInput, TouchableOpacity, Platform } from 'react-native';
-import * as Progress from 'react-native-progress';
-import { NewsItem } from '@components/NewsItem';
-import { ProgressHeader } from '@components/ProgressHeader';
-import theme from 'src/theme';
-import { useEffect, useState } from 'react';
-import { CaretLeft } from 'phosphor-react-native';
-import { StatusBar } from 'react-native';
-import { ActivityIndicator } from 'react-native-paper';
+import { View, StyleSheet, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { useState } from 'react';
+import { TextInput } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { useNavigation } from '@react-navigation/native';
+import { api } from '../../services/api';
 
-type ItemProps = { title: string, timestamp: string, people: string, src: string, key: string };
+export default function Registration() {
+  const navigation = useNavigation();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [address, setAddress] = useState('');
+  const [province, setProvince] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-interface HashMap<T> {
-  [key: string]: T;
-}
-
-interface ErrorHash {
-  electoralId?: string;
-  name?: string,
-  email?: string;
-  address?: string;
-  province?: string;
-  password?: string;
-  confirmPassword?: string;
-}
-
-const isValidElectoralId = (str: string) => {
-  const tmp = /^[A-Z0-9]+$/;
-  return tmp.test(str);
-}
-
-const isValidEmail = (str: string) => {
-  const tmp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return tmp.test(str);
-}
-
-const areEqualPasses = (str1: string, str2: string) => {
-  str1 = str1.trim();
-  str2 = str2.trim();
-  // console.log(str1, ' ', str2);
-  return str1.localeCompare(str2) === 0;
-}
-
-const isValidProvince = (str: string) => {
   const provinces = [
     "Bengo",
     "Benguela",
@@ -65,276 +36,229 @@ const isValidProvince = (str: string) => {
     "Zaire"
   ];
 
-  // console.log(str in provinces);
-
-  return provinces.find(x => x === str);
-}
-
-export function Registration({ navigation }: any) {
-  // ==== FIELDS ====
-  const [electoralId, setElectoralId] = useState<string>(""); // ABC123
-  const [name, setName] = useState<string>(""); // Abrar Ahmed
-  const [email, setEmail] = useState<string>(""); // heiopo@inf.elte.hu
-  const [address, setAddress] = useState<string>(""); // Luanda, 1332
-  const [province, setProvince] = useState<string>(""); // Luanda
-  const [password, setPassword] = useState<string>(""); // ABC123
-  const [confirmPassword, setConfirmPassword] = useState<string>(""); // ABC123
-  // ==== END FIELDS ====
-
-  // ==== SET DEFAULT VALUES ====
-  // ==== END VALUES ====
-
-  const onPressBack = () => {
-    navigation.navigate('Login');
-  }
-
-  const [errors, setErrors] = useState<ErrorHash>({});
-
-  const formValidation = () => {
-    let errorHash: ErrorHash = {};
-
-    if (!electoralId) errorHash.electoralId = "Electoral ID required.";
-    if (!isValidElectoralId(electoralId)) errorHash.electoralId = "Invalid electoral ID.";
-    if (!name) errorHash.name = "Name required.";
-    if (!email) errorHash.email = "E-mail required.";
-    if (!isValidEmail(email)) errorHash.email = "Invalid e-mail.";
-    if (!address) errorHash.address = "Address required.";
-    if (!province) errorHash.province = "Province required.";
-    if (!isValidProvince(province)) errorHash.province = "Invalid province.";
-
-    if (password.trim().length == 0 || confirmPassword.trim().length == 0) {
-      if (!password) errorHash.password = "Password required.";
-      if (!confirmPassword) errorHash.confirmPassword = "Password confirmation required.";
-    } else if (!areEqualPasses(password, confirmPassword)) {
-      errorHash.password = "Mismatch: Passwords do not match!";
-      errorHash.confirmPassword = errorHash.password;
+  const validateForm = () => {
+    if (!name || !email || !password || !confirmPassword || !address || !province) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return false;
     }
-
-    setErrors(errorHash);
-    return Object.keys(errorHash).length === 0;
-  }
-
-
-  const handleSubmit = () => {
-    if (formValidation()) {
-      console.log("Submitted ", electoralId, email, address, province, password, confirmPassword);
-
-      setIsLoading(true);
-
-      const body = JSON.stringify({
-        electoralId: electoralId,
-        name: name,
-        email: email,
-        address: address,
-        province: province,
-        password: password,
-      });
-
-      const URL = 'http://192.168.0.38:3010/api/committee/register-voter';
-      const method = 'POST';
-
-      fetch(URL, {
-        method: method,
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: body,
-      },).then(response => {
-        setIsLoading(false);
-        navigation.navigate('Login');
-      }).catch(error => {
-        console.log(error);
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 2000);
-      });
+    
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return false;
     }
-  }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return false;
+    }
+    
+    return true;
+  };
 
-  const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    setTimeout(() => {
+  const handleRegistration = async () => {
+    if (!validateForm()) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const response = await api.post('/auth/register', {
+        name,
+        email,
+        password,
+        address,
+        province
+      });
+      
+      if (response.status === 201) {
+        Alert.alert(
+          'Success', 
+          'Registration successful. Please check your email for verification.',
+          [{ text: 'OK', onPress: () => navigation.navigate('Login' as never) }]
+        );
+      }
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Registration failed. Please try again.';
+      Alert.alert('Error', message);
+    } finally {
       setIsLoading(false);
-    }, 2000);
-  }, []);
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={onPressBack}>
-          <CaretLeft size={32} />
-        </TouchableOpacity>
-        <ProgressHeader number='2' key='1' />
-      </View>
-      <View style={{ gap: 4, marginTop: 25, marginLeft: 10, marginRight: 10, flex: 1, backgroundColor: 'transparent' }}>
-        <Text style={{ textAlign: 'left', fontSize: 20, fontWeight: '600', paddingTop: 10 }}>Registration Information</Text>
-        <Text>Confirm and/or enter your personal details to register.</Text>
-
-        <View style={{ gap: 5, paddingTop: 10 }}>
-          <Text style={styles.textTitleInput}>Electoral ID</Text>
-          <TextInput style={styles.textInput} placeholder='Ex.: 12345AVSDSDSER'
-            onChangeText={text => {
-              setElectoralId(text.trim());
-            }}
-            value={electoralId}
-          />
-          {errors.electoralId ? <Text style={styles.errorText}>{errors.electoralId}</Text> : null}
-
-          <Text style={styles.textTitleInput}>Name</Text>
-          <TextInput style={styles.textInput} placeholder='Ex.: Abrar Ahmed'
-            onChangeText={text => {
-              setName(text);
-            }}
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Create Account</Text>
+        <Text style={styles.subtitle}>Join Chainocracy Voting System</Text>
+        
+        <View style={styles.formContainer}>
+          <Text style={styles.label}>Full Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your full name"
             value={name}
+            onChangeText={setName}
           />
-          {errors.name ? <Text style={styles.errorText}>{errors.name}</Text> : null}
-
-          <Text style={styles.textTitleInput}>E-mail</Text>
-          <TextInput style={styles.textInput} placeholder='Ex.: abrar.martins@hotmail.com'
-            onChangeText={text => {
-              setEmail(text);
-            }}
+          
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            keyboardType="email-address"
+            autoCapitalize="none"
             value={email}
+            onChangeText={setEmail}
           />
-
-          {errors.email ? <Text style={styles.errorText}>{errors.email}</Text> : null}
-
-          <Text style={styles.textTitleInput}>Address</Text>
-          <TextInput style={styles.textInput} placeholder='Ex.: Maianga, Washington, America'
-            onChangeText={text => {
-              setAddress(text);
-            }}
-            value={address}
-          />
-
-          {errors.address ? <Text style={styles.errorText}>{errors.address}</Text> : null}
-
-          <Text style={styles.textTitleInput}>Province</Text>
-          <TextInput style={styles.textInput} placeholder='Ex.: Luanda'
-            onChangeText={text => {
-              setProvince(text);
-            }}
-            value={province}
-          />
-
-          {errors.province ? <Text style={styles.errorText}>{errors.province}</Text> : null}
-
-
-          <Text style={styles.textTitleInput}>Password</Text>
+          
+          <Text style={styles.label}>Password</Text>
           <TextInput
-            style={styles.textInput}
-            placeholder='Ex.: xxxxxxxxxx'
-            onChangeText={text => {
-              setPassword(text);
-            }}
+            style={styles.input}
+            placeholder="Create a password"
+            secureTextEntry
             value={password}
-            secureTextEntry={true}
-            autoComplete="off"
-            textContentType="none"
+            onChangeText={setPassword}
           />
-
-
-          {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
-
-          <Text style={styles.textTitleInput}>Confirm password</Text>
+          
+          <Text style={styles.label}>Confirm Password</Text>
           <TextInput
-            style={styles.textInput}
-            placeholder='Ex.: xxxxxxxxxx'
-            onChangeText={text => {
-              setConfirmPassword(text);
-            }}
+            style={styles.input}
+            placeholder="Confirm your password"
+            secureTextEntry
             value={confirmPassword}
-            secureTextEntry={true}
-            autoComplete="off"
-            textContentType="none"
+            onChangeText={setConfirmPassword}
           />
-
-
-          {errors.confirmPassword ? <Text style={styles.errorText}>{errors.confirmPassword}</Text> : null}
-
-        </View>
-
-        <View style={{ flex: 1, backgroundColor: 'transparent', height: '100%', marginTop: 5 }}>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 5, height: '100%' }}>
-            {isLoading ? <ActivityIndicator size="small" color="#969696" /> : null}
+          
+          <Text style={styles.label}>Address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your address"
+            value={address}
+            onChangeText={setAddress}
+          />
+          
+          <Text style={styles.label}>Province</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={province}
+              onValueChange={(itemValue) => setProvince(itemValue)}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select your province" value="" />
+              {provinces.map((prov, index) => (
+                <Picker.Item key={index} label={prov} value={prov} />
+              ))}
+            </Picker>
+          </View>
+          
+          <TouchableOpacity 
+            style={[styles.button, isLoading && styles.buttonDisabled]}
+            onPress={handleRegistration}
+            disabled={isLoading}
+          >
+            <Text style={styles.buttonText}>
+              {isLoading ? 'Registering...' : 'Register'}
+            </Text>
+          </TouchableOpacity>
+          
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Already have an account?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login' as never)}>
+              <Text style={styles.loginLink}>Login</Text>
+            </TouchableOpacity>
           </View>
         </View>
-
-        <View style={styles.containerLevel}>
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.textConfirm}>Submit</Text>
-          </TouchableOpacity>
-        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
-    backgroundColor: '#ffffff',
-    width: '100%',
-    height: '100%',
-    flexDirection: 'column',
-  }, textTitleInput: {
-    color: '#969696',
-    fontWeight: '500'
-  }, textInput: {
-    width: '100%',
-    borderRadius: 7,
-    color: '#666666',
-    fontSize: 15,
-    borderColor: theme.COLORS.GRAY_BORDER_INPUT_TEXT,
-    paddingLeft: 15,
-    borderWidth: 0.7,
-    height: 40
-  }, containerLevel: {
-    width: '100%',
-    paddingTop: 0,
+    flex: 1,
+    backgroundColor: '#f5f5f5',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 30,
-    position: 'absolute',
-    bottom: 0,
-    alignSelf: 'flex-end',
-    backgroundColor: 'transparent',
-    flex: 1
-  }, buttonView: {
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-    width: '90%',
-    gap: 9,
-    paddingBottom: 10,
-    paddingTop: 5
-  }, button: {
-    width: '85%',
-    alignItems: 'center',
-    backgroundColor: '#a9a9a9',
-    borderColor: '#a8a8a8',
-    padding: 15,
-    borderWidth: 1,
-    borderRadius: 8,
-    elevation: 55,
-    shadowColor: 'black',
-    shadowOffset: {
-      width: 6,
-      height: 6
-    },
-    shadowOpacity: 0.12
-  }, textConfirm: {
-    color: '#ffffff',
-    fontSize: 18,
-    textAlign: 'center', // Center the text horizontally
-    textAlignVertical: 'center',
-    fontWeight: '700'
-  }, topBar: {
-    gap: 2,
-    marginTop: Platform.OS === 'android' ? StatusBar.currentHeight : 45,
-    height: 20
-  }, errorText: {
-    color: 'red',
+    padding: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
     marginBottom: 10,
-  }
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 30,
+  },
+  formContainer: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#555',
+    marginBottom: 5,
+  },
+  input: {
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    marginBottom: 15,
+    paddingHorizontal: 15,
+    fontSize: 16,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    marginBottom: 15,
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  button: {
+    backgroundColor: '#2196F3',
+    height: 50,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  buttonDisabled: {
+    backgroundColor: '#a0d1f7',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  loginText: {
+    color: '#666',
+  },
+  loginLink: {
+    color: '#2196F3',
+    fontWeight: 'bold',
+    marginLeft: 5,
+  },
 });

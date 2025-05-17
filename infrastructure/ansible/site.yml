@@ -1,49 +1,109 @@
 ---
-# Main Ansible playbook (site.yml)
-# This playbook orchestrates tasks across different host groups.
-# Given the Terraform setup (ECS Fargate, S3/CloudFront), this playbook
-# might be more focused on CI/CD steps or managing auxiliary hosts (e.g., bastion).
+# Main Ansible playbook for Chainocracy deployment
+# This playbook orchestrates the deployment of Chainocracy components across different environments
 
-# Example Playbook Structure:
+- name: Apply common configuration to all hosts
+  hosts: all
+  become: yes
+  roles:
+    - common
+  tags:
+    - common
 
-# - name: Apply common configuration to all relevant hosts (e.g., build agents, bastion)
-#   hosts: all # Or specific groups like build_agents, bastion_hosts
-#   roles:
-#     - common
+- name: Deploy Backend API
+  hosts: backend_servers
+  become: yes
+  vars:
+    app_name: chainocracy-backend
+    app_port: 3000
+    node_env: "{{ environment | default('production') }}"
+    db_host: "{{ lookup('env', 'DB_HOST') }}"
+    db_name: "{{ lookup('env', 'DB_NAME') }}"
+    db_user: "{{ lookup('env', 'DB_USER') }}"
+    db_password: "{{ lookup('env', 'DB_PASSWORD') }}"
+  roles:
+    - role: backend
+      tags:
+        - backend
+        - api
 
-# - name: Deploy Backend (e.g., trigger ECS update via CI/CD pipeline)
-#   hosts: localhost # Or build_agents
-#   gather_facts: no
-#   roles:
-#     - role: backend
-#       vars:
-#         new_task_definition_revision: "{{ lookup("env", "NEW_TASK_REVISION") }}" # Example: Get revision from env var
-#   tags:
-#     - deploy-backend
+- name: Deploy Web Frontend
+  hosts: web_servers
+  become: yes
+  vars:
+    app_name: chainocracy-web
+    app_port: 80
+    api_url: "{{ backend_api_url | default('https://api.chainocracy.io') }}"
+    node_env: "{{ environment | default('production') }}"
+  roles:
+    - role: frontend_web
+      tags:
+        - frontend
+        - web
 
-# - name: Build and Deploy Frontend (e.g., build, sync to S3, invalidate CloudFront via CI/CD)
-#   hosts: localhost # Or build_agents
-#   gather_facts: no
-#   vars:
-#     build_dir: "/path/to/checkout/on/build/agent"
-#     frontend_s3_bucket_id: "{{ lookup("env", "FRONTEND_S3_BUCKET") }}"
-#     frontend_cloudfront_distribution_id: "{{ lookup("env", "FRONTEND_CF_DIST_ID") }}"
-#     backend_api_url: "{{ lookup("env", "BACKEND_API_URL") }}"
-#   roles:
-#     - role: frontend_web
-#   tags:
-#     - deploy-frontend
+- name: Deploy Mobile Frontend Build Environment
+  hosts: build_servers
+  become: yes
+  vars:
+    app_name: chainocracy-mobile
+    api_url: "{{ backend_api_url | default('https://api.chainocracy.io') }}"
+    build_type: "{{ build_type | default('release') }}"
+  roles:
+    - role: mobile_build
+      tags:
+        - mobile
+        - build
 
-- name: Placeholder Playbook
-  hosts: localhost
-  gather_facts: no
-  tasks:
-    - name: Display information about Ansible usage
-      ansible.builtin.debug:
-        msg:
-          - "This is a placeholder Ansible playbook."
-          - "With ECS Fargate and S3/CloudFront managed by Terraform, Ansible is typically used within a CI/CD pipeline."
-          - "Roles 'backend' and 'frontend_web' contain example tasks for deployment steps (e.g., triggering ECS updates, building/syncing frontend assets)."
-          - "The 'common' role contains tasks for setting up build agents or bastion hosts if needed."
-          - "Update the 'hosts' file and this playbook based on your specific CI/CD workflow and any auxiliary hosts."
+- name: Configure Monitoring and Logging
+  hosts: monitoring_servers
+  become: yes
+  vars:
+    grafana_admin_password: "{{ lookup('env', 'GRAFANA_ADMIN_PASSWORD') }}"
+    prometheus_retention_days: 15
+  roles:
+    - role: monitoring
+      tags:
+        - monitoring
 
+- name: Configure Blockchain Node
+  hosts: blockchain_nodes
+  become: yes
+  vars:
+    node_type: "{{ node_type | default('validator') }}"
+    network: "{{ network | default('mainnet') }}"
+    p2p_port: 26656
+    rpc_port: 26657
+  roles:
+    - role: blockchain_node
+      tags:
+        - blockchain
+        - node
+
+- name: Configure Load Balancers
+  hosts: load_balancers
+  become: yes
+  vars:
+    backend_servers: "{{ groups['backend_servers'] }}"
+    web_servers: "{{ groups['web_servers'] }}"
+    ssl_cert_path: "/etc/ssl/certs/chainocracy.crt"
+    ssl_key_path: "/etc/ssl/private/chainocracy.key"
+  roles:
+    - role: load_balancer
+      tags:
+        - lb
+        - networking
+
+- name: Configure Backup System
+  hosts: backup_servers
+  become: yes
+  vars:
+    backup_retention_days: 30
+    backup_schedule: "0 2 * * *"  # Daily at 2 AM
+    backup_destinations:
+      - type: s3
+        bucket: "chainocracy-backups"
+        region: "us-west-2"
+  roles:
+    - role: backup
+      tags:
+        - backup

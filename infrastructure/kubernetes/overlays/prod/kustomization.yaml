@@ -1,5 +1,3 @@
-# kustomization.yaml for prod overlay
-
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
@@ -7,37 +5,102 @@ kind: Kustomization
 resources:
 - ../../base
 
-namespace: chainocracy # Ensure namespace is set
+namespace: chainocracy-prod
 
 # Environment-specific patches or configurations
 patchesStrategicMerge:
 - backend-deployment-patch.yaml
-- frontend-web-deployment-patch.yaml # Include if deploying frontend via K8s
-- backend-ingress-patch.yaml
-- frontend-web-ingress-patch.yaml # Include if deploying frontend via K8s
+- frontend-web-deployment-patch.yaml
+- backend-hpa-patch.yaml
+- frontend-web-hpa-patch.yaml
 
 # Add environment-specific labels
 commonLabels:
   environment: prod
+  tier: application
 
-# Override image tags for prod (use specific version tags)
+# Override image tags for production environment
 images:
-- name: placeholder-registry/chainocracy-backend
-  newTag: v1.0.0 # Replace with actual production tag
-- name: placeholder-registry/chainocracy-frontend-web
-  newTag: v1.0.0 # Replace with actual production tag
+- name: ${REGISTRY_URL}/chainocracy-backend
+  newName: ${REGISTRY_URL}/chainocracy-backend
+  newTag: ${RELEASE_VERSION}
+- name: ${REGISTRY_URL}/chainocracy-frontend-web
+  newName: ${REGISTRY_URL}/chainocracy-frontend-web
+  newTag: ${RELEASE_VERSION}
 
-# Example: Add production secrets (use sealed secrets or similar mechanism)
-# secrets:
-# - name: backend-secrets-prod
-#   files:
-#     - secrets/db_password.txt
+# Configure resource limits for production environment
+configMapGenerator:
+- name: backend-config
+  behavior: merge
+  literals:
+  - node_env=production
+  - log_level=info
+  - blockchain_node_url=http://blockchain-node-service.chainocracy-prod:26657
 
-# Example: Add production ConfigMap
-# configMapGenerator:
-# - name: backend-config-prod
-#   behavior: merge
-#   literals:
-#     - LOG_LEVEL=warn
-#     - API_BASE_URL=https://api.chainocracy.example.com # Replace with actual prod API domain
+- name: frontend-config
+  behavior: merge
+  literals:
+  - api_url=https://api.chainocracy.io
+  - environment=production
+  - blockchain_node_url=https://node.chainocracy.io
 
+- name: nginx-config
+  behavior: merge
+  files:
+  - nginx/production.conf
+
+# Add production-specific secrets (in a real environment, use a secret management solution)
+# Note: In production, use a proper secrets management solution like HashiCorp Vault,
+# AWS Secrets Manager, or Kubernetes External Secrets
+secretGenerator:
+- name: backend-secrets
+  behavior: merge
+  files:
+  - secrets/db_host.txt
+  - secrets/db_port.txt
+  - secrets/db_name.txt
+  - secrets/db_user.txt
+  - secrets/db_password.txt
+  - secrets/jwt_secret.txt
+
+- name: frontend-secrets
+  behavior: merge
+  files:
+  - secrets/firebase_api_key.txt
+  - secrets/firebase_auth_domain.txt
+  - secrets/firebase_project_id.txt
+  - secrets/firebase_storage_bucket.txt
+  - secrets/firebase_messaging_sender_id.txt
+  - secrets/firebase_app_id.txt
+
+# Configure resource patches for production
+patches:
+- path: resource-patch.yaml
+  target:
+    kind: Deployment
+    labelSelector: "app in (chainocracy-backend, chainocracy-frontend-web)"
+
+# Configure replicas for production environment
+replicas:
+- name: backend-deployment
+  count: 5
+- name: frontend-web-deployment
+  count: 3
+
+# Configure network policies
+resources:
+- network-policies.yaml
+
+# Configure pod disruption budgets
+resources:
+- pod-disruption-budgets.yaml
+
+# Configure monitoring and alerting
+resources:
+- monitoring/service-monitors.yaml
+- monitoring/prometheus-rules.yaml
+
+# Configure ingress resources
+resources:
+- ingress/backend-ingress.yaml
+- ingress/frontend-ingress.yaml
