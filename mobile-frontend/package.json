@@ -1,119 +1,63 @@
 {
-  "name": "chainocracy",
-  "plugins": [
-    [
-      "expo-camera",
-      {
-        "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-        "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-        "recordAudioAndroid": true
-      },
-      "expo-barcode-scanner",
-      {
-        "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
-      },
-      "expo-document-picker",
-      {
-        "iCloudContainerEnvironment": "Production"
-      }
-    ]
-  ],
+  "name": "chainocracy-mobile-tests",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
+  "description": "Comprehensive test suite for Chainocracy mobile frontend",
+  "main": "index.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
-    "web": "expo start --web"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/**/*.d.ts",
+      "!src/assets/**",
+      "!src/@types/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 70,
+        "lines": 70,
+        "statements": 70
+      }
+    }
   },
   "dependencies": {
-    "@expo-google-fonts/roboto": "^0.2.3",
-    "@expo-google-fonts/space-mono": "^0.2.3",
-    "@expo/metro-runtime": "~3.2.3",
-    "@expo/webpack-config": "~19.0.1",
-    "@react-native-masked-view/masked-view": "0.3.1",
-    "@react-navigation/material-bottom-tabs": "^6.2.28",
-    "@react-navigation/material-top-tabs": "^6.6.13",
-    "@react-navigation/native": "^6.1.17",
-    "@react-navigation/native-stack": "^6.9.26",
-    "@react-navigation/stack": "^6.3.29",
-    "@types/react-native-video": "^5.0.20",
-    "axios": "^1.6.8",
-    "dotenv": "^16.4.5",
-    "expo": "~51.0.4",
-    "expo-app-loading": "^2.1.1",
-    "expo-av": "~14.0.4",
-    "expo-barcode-scanner": "~13.0.1",
-    "expo-camera": "~15.0.7",
-    "expo-clipboard": "~6.0.3",
-    "expo-document-picker": "~12.0.1",
-    "expo-font": "~12.0.5",
-    "expo-linear-gradient": "~13.0.2",
-    "expo-modules-core": "^1.12.9",
-    "expo-secure-store": "~13.0.1",
-    "expo-splash-screen": "~0.27.4",
-    "expo-status-bar": "~1.12.1",
-    "firebase": "^10.11.1",
-    "phosphor-react-native": "^2.0.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
     "react-native": "0.74.1",
-    "react-native-check-box": "^2.1.7",
-    "react-native-countdown-component": "^2.7.1",
-    "react-native-dotenv": "^3.4.11",
-    "react-native-flat-button": "^1.0.6",
-    "react-native-gesture-handler": "~2.16.1",
-    "react-native-pager-view": "6.3.0",
-    "react-native-paper": "^5.12.3",
-    "react-native-progress": "^5.0.1",
-    "react-native-rsa-native": "^2.0.5",
-    "react-native-safe-area-context": "4.10.1",
-    "react-native-screens": "3.31.1",
-    "react-native-svg": "15.2.0",
-    "react-native-svg-transformer": "^1.3.0",
-    "react-native-tab-view": "^3.5.2",
-    "react-native-vector-icons": "^10.0.3",
-    "react-native-video": "^5.2.1",
-    "react-native-web": "~0.19.10",
-    "react-player": "^2.16.0"
+    "axios": "^1.6.8",
+    "expo": "~51.0.4",
+    "expo-secure-store": "~13.0.1",
+    "react-native-svg": "15.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@eslint/js": "^9.27.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/preset-typescript": "^7.20.0",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^12.4.3",
     "@types/jest": "^29.5.12",
+    "@types/react": "~18.2.45",
     "@types/react-native": "^0.73.0",
-    "@types/react-native-countdown-component": "^2.7.4",
-    "@types/react-native-vector-icons": "^6.4.18",
-    "@typescript-eslint/eslint-plugin": "^8.31.0",
-    "@typescript-eslint/parser": "^8.31.0",
-    "babel-plugin-module-resolver": "^5.0.0",
-    "eslint": "^9.25.1",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-native": "^5.0.0",
-    "typescript": "^5.1.3",
-    "typescript-eslint": "^8.32.1"
-  },
-  "overrides": {
-    "@types/react": "~18.2.45"
-  },
-  "private": true,
-  "description": "npx expo start",
-  "author": "Abrar Ahmed",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CodeTyperPro/blockchain-mobile-frontend.git"
-  },
-  "keywords": [
-    "react-native",
-    "typescript",
-    "axios"
-  ],
-  "bugs": {
-    "url": "https://github.com/CodeTyperPro/blockchain-mobile-frontend/issues"
-  },
-  "homepage": "https://github.com/CodeTyperPro/blockchain-mobile-frontend#readme",
-  "resolutions": {
-    "styled-components": "^6"
+    "@types/react-test-renderer": "^18.0.7",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "jest-expo": "^51.0.0",
+    "msw": "^2.2.3",
+    "react-test-renderer": "18.2.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.1.3"
   }
 }
