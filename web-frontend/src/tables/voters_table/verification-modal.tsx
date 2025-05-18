@@ -45,7 +45,7 @@ export default function VerificationModal({ isOpen, onOpenChange, url }: EditVot
 
     useEffect(() => {
         VerifySecret();
-    }, []);
+    }, [VerifySecret, url]);
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange} defaultOpen={false}>

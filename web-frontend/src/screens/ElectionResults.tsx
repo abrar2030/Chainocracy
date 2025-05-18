@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Candidate, CandidateResults } from '@/data_types';
+import { CandidateResults } from '@/data_types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
 import { columns } from "@/tables/election_results_table/columns";

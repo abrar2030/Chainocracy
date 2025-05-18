@@ -11,14 +11,15 @@ import { Button } from "@/components/ui/button";
 type EditVoterModalProps = {
     isOpen?: boolean;
     onOpenChange?: (e: boolean) => void;
-    identifier: string;
+    // Removing unused prop
+    // identifier: string;
 }
 
-export default function RevealModal({ isOpen, onOpenChange, identifier }: EditVoterModalProps) {
-
-    const revealVoter = () => {
-        
-    }
+export default function RevealModal({ isOpen, onOpenChange }: EditVoterModalProps) {
+    // Removing unused function
+    // const revealVoter = () => {
+    //    
+    // }
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange} defaultOpen={false}>

@@ -1,4 +1,5 @@
-import { Voter } from "@/data_types";
+// Removing unused import
+// import { Voter } from "@/data_types";
 
 export const columns = [
   {

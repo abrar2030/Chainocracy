@@ -1,4 +1,3 @@
-import { request } from "axios";
 import { randomUUID } from "crypto";
 import BlockChain from "../blockchain/blockchain";
 
@@ -73,15 +72,17 @@ app.post('/connect_node', function (req, res) {
   }, 100);
 });
 
-const isNodePresent = (node) => {
-  if (node === NODE_ADDRESS) return true;
-  return allNodes.findIndex(x => x == node) !== -1;
-}
+// Removed unused function
+// const isNodePresent = (node) => {
+//   if (node === NODE_ADDRESS) return true;
+//   return allNodes.findIndex(x => x == node) !== -1;
+// }
 
-const removeAllNodes = () => {
-  const nodeList = [NODE_ADDRESS]
-  return nodeList;
-}
+// Removed unused function
+// const removeAllNodes = () => {
+//   const nodeList = [NODE_ADDRESS]
+//   return nodeList;
+// }
 
 const getAllNodes = () => {
   const nodeList = [...new Set(allNodes)]
@@ -102,7 +103,7 @@ const addNode = (node) => {
 const requestSingleConnection = (url, thisAllNodes) => {
   axios.
     post(LOCALHOST + url + '/update_nodes', { urls: thisAllNodes }).
-    then(_ => { }).catch(error => console.error(error))
+    then(() => { }).catch(error => console.error(error))
 }
 
 const requestConnection = (thisAllNodes, destines) => {
@@ -130,7 +131,7 @@ const requestConnection = (thisAllNodes, destines) => {
     requests.push(request);
   });
 
-  Promise.all(requests).then(data => { }).then(data => {
+  Promise.all(requests).then(() => { }).then(() => {
     let allGood = true;
     let newNodes = [];
 
@@ -239,7 +240,7 @@ const serverDisplay = () => {
   askQuestion();
 }
 
-server.listen(SERVER_PORT, (_) => {
+server.listen(SERVER_PORT, () => {
   serverDisplay();
 });
 
@@ -262,7 +263,7 @@ const clients = {}
 const newClient = (url) => {
   const client = io_client.connect(url);
   clients[url] = clients[url] ? clients[url] : client;
-  clients[url].on('connect', (data) => {
+  clients[url].on('connect', () => {
     console.log('I am a client, I could connect.');
     serverConnected(client);
   });
@@ -297,9 +298,10 @@ const printHeader = (): void => {
   askOption(); // Ensure this function is defined elsewhere
 }
 
-const resetNode = () => {
-  removeAllNodes();
-}
+// Removed unused function
+// const resetNode = () => {
+//   removeAllNodes();
+// }
 
 const addNewNode = (): void => {
   console.clear();
@@ -321,7 +323,7 @@ const addNewNode = (): void => {
       if (data.status === 201) {
         console.log("Nodes added.");
       }
-    }).catch(_ => console.error("Failure detected."));
+    }).catch(error => console.error("Failure detected:", error));
 
     setTimeout(listNodes, 500);
   });

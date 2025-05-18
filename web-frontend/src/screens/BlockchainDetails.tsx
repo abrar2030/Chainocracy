@@ -45,12 +45,6 @@ function BlockchainDetails() {
     const [blockIndex, setBlockIndex] = useState<number | null>(0);
     const [transactionCounter, setTransactionCounter] = useState<number | null>(0);
 
-    useEffect(() => {
-        if (data) {
-            handleRefresh();
-        }
-    }, [data]);
-
     const handleRefresh = () => {
         setBlockHeader(data.blockHeader);
         setBlockSize(data.blockSize);
@@ -59,10 +53,16 @@ function BlockchainDetails() {
     }
 
     useEffect(() => {
+        if (data) {
+            handleRefresh();
+        }
+    }, [data, handleRefresh]);
+
+    useEffect(() => {
         console.log("ID changed ...");
         setBlockHash(id ?? '');
         refetch();
-    }, [id]);
+    }, [id, refetch]);
 
     if (isLoading) return 'Loading...'
 

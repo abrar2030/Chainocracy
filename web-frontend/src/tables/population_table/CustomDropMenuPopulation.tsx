@@ -55,7 +55,6 @@ export default function CustomDropMenuPopulation({ citizen, setData, toast}: Cus
                         axios.post(`http://${GLOBAL_VARIABLES.LOCALHOST}/api/committee/send-email`, options)
                             .then(response => {
                                 if (response.status === 200) {
-                                    const data = response.data;
                                     // console.log("Success response:", data);
                                     toast({
                                         title: "Feedback",
@@ -116,8 +115,7 @@ export default function CustomDropMenuPopulation({ citizen, setData, toast}: Cus
                                         }
                                     }
                                 }
-                            }).catch(_ => {
-                                // console.error(error)
+                            }).catch(() => {
                                 toast({
                                     title: "Feedback",
                                     description: "Error! Something went wrong."

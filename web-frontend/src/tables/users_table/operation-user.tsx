@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useFirebaseStorage, getItemName, getUsername, getSpeech, uploadImage } from '@/services/firebase';
+import { uploadImage } from '@/services/firebase';
 import { User } from '@/data_types';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
@@ -17,19 +17,19 @@ const mockUpdateImageList = (newImage: string) => {
 interface UserModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  defaultValues: User;
-  setData: any;
+  defaultValues: User | null;
+  setData: React.Dispatch<React.SetStateAction<User[]>>;
   mode: boolean;
-  toast: any;
+  toast: (props: { title: string; description: string }) => void;
 }
 
-export const UserModal = ({ isOpen, onOpenChange, defaultValues, setData, mode, toast }: UserModalProps) => {
-  const [name, setName] = useState(defaultValues.name || '');
-  const [username, setUsername] = useState(defaultValues.username || '');
-  const [password, setPassword] = useState(defaultValues.password || '');
+export const UserModal = ({ isOpen, onOpenChange, defaultValues, mode, toast }: UserModalProps) => {
+  const [name, setName] = useState(defaultValues?.name || '');
+  const [username, setUsername] = useState(defaultValues?.username || '');
+  const [password, setPassword] = useState(defaultValues?.password || '');
   
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && defaultValues) {
       setName(defaultValues.name || '');
       setUsername(defaultValues.username || '');
       setPassword(defaultValues.password || '');
@@ -105,7 +105,7 @@ const UserOperations = () => {
     }
   };
 
-  const handleUpload = async (data: any) => {
+  const handleUpload = async (data: { photoFile: File }) => {
     if (!data.photoFile) {
       toast({
         title: "Error",

@@ -18,7 +18,7 @@ function Entrance() {
         }
 
         loadImages(setImageList);
-    }, []);
+    }, [authState?.authenticated, isLoggedIn, navigate, setImageList]);
 
     return (
         <div className='flex flex-col gap-2 w-screen h-screen'>

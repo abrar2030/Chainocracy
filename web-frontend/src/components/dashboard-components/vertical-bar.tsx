@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function VerticalBars() {
-    const { topVotesPerProvinces, provinces } = useAuth();
+    const { topVotesPerProvinces } = useAuth();
 
     const [dataset, setDataset] = useState([
         {

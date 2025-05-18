@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/dialog";
 
 import { api } from '../../services/api';
-import { useToast } from "@/components/toast/use-toast";
 import { Citizen } from "@/data_types";
 
 const provinces = [

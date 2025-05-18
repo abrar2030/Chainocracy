@@ -1,4 +1,3 @@
- 
 import useCoffeeDataamerica, { IMapProvincy } from '../../hooks/useCoffeeDataamerica';
 
 import './americaMap.scss';
@@ -12,7 +11,7 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import Tooltip from '../Tooltip/Tooltip';
 
-export default function americaMap() {
+export default function AmericaMap() {
 
   const tooltip = useRef<HTMLDivElement>(null);
   const [tooltipContent, setTooltipContent] = useState<ReactNode>(null);

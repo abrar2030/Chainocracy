@@ -1,5 +1,4 @@
-import { Console } from "console";
-import { HashMap } from "../blockchain/data_types";
+// Fixed duplicate import
 import axios from 'axios';
 
 export interface Data {
@@ -35,7 +34,7 @@ class P2P {
 
     public getPeers() {
         const arr: Data[] = [];
-        this.peers.forEach((value, key) => {
+        this.peers.forEach((value) => {
             arr.push(value);
         });
 
@@ -60,7 +59,7 @@ class P2P {
 
         try {
             await Promise.all(requests)
-                .then(x => {
+                .then(() => {
                     const opt = {
                         url: newNodeUrl + "/register-nodes-bulk",
                         method: "post",
@@ -68,8 +67,8 @@ class P2P {
                     };
 
                     return axios(opt);
-                }).then(x => {
-                    //console.log(x);
+                }).then(() => {
+                    // Response handling
                 })
                 .catch(error => {
                     console.log("Error: ", error);

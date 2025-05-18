@@ -1,4 +1,3 @@
- 
 import 'resize-observer-polyfill';
 import { fireEvent, render, screen } from '@testing-library/react';
 import Login from '@/screens/Login';
@@ -201,7 +200,7 @@ describe('PopulationData Component', () => {
     });
 
     it('loads and displays data correctly', async () => {
-        (axios.get as any).mockResolvedValue(mockData);
+        (axios.get as unknown).mockResolvedValue(mockData);
 
         render(<PopulationData />);
 

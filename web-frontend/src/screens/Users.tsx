@@ -13,14 +13,14 @@ import { User } from '@/data_types';
 
 function Users() {
   const [data, setData] = useState<User[]>([]);
-  const { imageList, setImageList, updateImages } = useAuth();
+  const { imageList, updateImages } = useAuth();
 
   const { toast } = useToast();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     onPressLoadUsers();
-  }, []);
+  }, [onPressLoadUsers]);
 
   const onPressLoadUsers = () => {
     updateImages();
@@ -64,7 +64,7 @@ function Users() {
 
           setData([...newData]);
         }
-      }).catch(error => { });
+      }).catch(() => { /* Error handling */ });
   }
 
   return (

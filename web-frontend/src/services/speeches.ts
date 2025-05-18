@@ -1,12 +1,5 @@
- 
-
 import { CandidateResult, Results } from "@/data_types";
-
- 
-import fs from "fs";
-import path from "path";
-import OpenAI from "openai";
-import { Buffer } from 'buffer';
+// Removing unused imports
 // import 'dotenv/config';
 
 export const UltimateSpeech = async (results: Results) => {

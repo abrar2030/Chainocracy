@@ -1,15 +1,14 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Editor } from "@monaco-editor/react";
-import { CODE_SNIPPETS } from "./constants";
 
 type JsonProp = {
-  data: any
+  data: Record<string, unknown>
 }
 
 
 const JsonEditor = ({data}: JsonProp) => {
   const editorRef = useRef();
-  const [value, setValue] = useState("");
+  // Removed unused state variables
   const language = "";
 
   const onMount = (editor) => {

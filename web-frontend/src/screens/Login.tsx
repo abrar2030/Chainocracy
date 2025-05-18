@@ -8,7 +8,7 @@ function Login() {
 
   useEffect(() => {
     onLogOut!();
-  }, []);
+  }, [onLogOut]);
 
   return (
     <div className='flex flex-col items-center justify-center gap-2 w-screen h-screen'>

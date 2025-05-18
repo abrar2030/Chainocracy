@@ -1,4 +1,3 @@
-import assert from 'assert';
 import { Voter, Candidate, Results, CandidateResult, HashMap } from '../blockchain/data_types';
 import CryptoBlockchain from '../crypto/cryptoBlockchain';
 import { clearResults, clearVoters, readAnnouncement, readCandidates, readCitizens, readResults, readVoters, writeResults } from '../leveldb';
