@@ -1,17 +1,17 @@
 module.exports = {
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
+    'eslint:recommended'
   ],
   rules: {
-    '@typescript-eslint/no-unused-vars': 'warn',
-    '@typescript-eslint/no-explicit-any': 'warn',
+    'no-unused-vars': 'warn',
+    'no-empty': 'warn',
+    'require-yield': 'warn',
+    'no-unsafe-finally': 'warn'
   },
   env: {
     node: true,
-    es6: true
+    es6: true,
+    jest: true
   },
   parserOptions: {
     ecmaVersion: 2020,
