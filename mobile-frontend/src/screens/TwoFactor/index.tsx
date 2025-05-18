@@ -19,13 +19,30 @@ const writeFile = async (token: string) => {
     await FileSystem.writeAsStringAsync(fileUri, token);
     console.log('File written successfully.');
     // console.log('URL: ', fileUri);
-};
+}
 
-export function TwoFactor({ navigation, route }: any) {
-    const { id, name, party, acronym, photo, src, isFactor } = route.params;
+interface TwoFactorProps {
+    navigation: {
+        navigate: (screen: string) => void;
+    };
+    route: {
+        params?: {
+            id: string;
+            name: string;
+            party: string;
+            acronym: string;
+            photo: string;
+            src: string;
+            isFactor: boolean;
+        };
+    };
+}
+
+export default function TwoFactor({ navigation, route }: TwoFactorProps) {
+    const { id, name, party, acronym, photo, src, isFactor } = route.params || {};
 
     const numColumns = 6;
-    const [candidates, setCandidates] = useState([
+    const [candidates, _setCandidates] = useState([
         {
             name: name,
             party: party,
@@ -37,7 +54,7 @@ export function TwoFactor({ navigation, route }: any) {
 
     const [numCodes, setNumCodes] = useState([11, 12, 13, 14, 15, 16]);
 
-    const [numbers, setNumbers] = useState([
+    const [numbers, _setNumbers] = useState([
         {
             number: '1',
             key: '1'
@@ -93,7 +110,7 @@ export function TwoFactor({ navigation, route }: any) {
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     const { authState, onLogOut } = useAuth();
-    const [activeScreen, setActiveScreen] = useState("Login");
+    const [_activeScreen, setActiveScreen] = useState(0);
 
     useEffect(() => {
         // alert("Check authentication :)");
@@ -221,7 +238,7 @@ export function TwoFactor({ navigation, route }: any) {
                     <FlatList
                         data={numbers}
                         renderItem={({ item }) => <PinItem number={item.number} key={item.key} token={otpCode} setToken={setOtpCode} numCodes={numCodes} setNumCodes={setNumCodes} setIsRefresh={setIsRefreshing} />}
-                        keyExtractor={item => item.key}
+                        keyExtractor={(item): string => item.key}
                         showsVerticalScrollIndicator={false}
                         alwaysBounceVertical={false}
                         numColumns={3}
@@ -233,7 +250,7 @@ export function TwoFactor({ navigation, route }: any) {
                         data={candidates}
                         renderItem={({ item }) => {
                             return (
-                                <View style={{ paddingTop: 20 }}>
+                                <View style={styles.candidateContainer}>
                                     <Text style={styles.textVoting}>Voting for</Text>
                                     <CandidateItem
                                         id={item.key}
@@ -246,7 +263,7 @@ export function TwoFactor({ navigation, route }: any) {
                                 </View>
                             );
                         }}
-                        keyExtractor={item => item.key}
+                        keyExtractor={(item): string => item.key}
                         showsVerticalScrollIndicator={false}
                         alwaysBounceVertical={false}
                         style={styles.containerFlatCandidate}

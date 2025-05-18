@@ -20,7 +20,7 @@ type CountDownProps = {
 
 const Countdown = ({ remainingTime }: CountDownProps) => {
   const [sec, setSec] = useState<number>(remainingTime); // Initial time in seconds
-  let [fontsLoaded] = useFonts({
+  const [fontsLoaded] = useFonts({
     SpaceMono_400Regular,
     SpaceMono_400Regular_Italic,
     SpaceMono_700Bold,
@@ -69,7 +69,7 @@ const Countdown = ({ remainingTime }: CountDownProps) => {
 
   const dec = (x: number) => x < 10 ? '0' + x : x;
 
-  let fontSize = 28;
+  const fontSize = 28;
 
   const style = {
     flex: 1,

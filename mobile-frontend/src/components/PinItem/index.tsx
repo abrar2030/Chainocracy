@@ -18,7 +18,7 @@ export function PinItem(prop: ItemPropsNumber) {
   const onPressDel = () => {
     const len = prop.token.length;
     if (len == 0) return;
-    let oldToken = prop.token.substring(0, len - 1);
+    const oldToken = prop.token.substring(0, len - 1);
     prop.setToken(oldToken);
     updatePIN(len - 1);
   };

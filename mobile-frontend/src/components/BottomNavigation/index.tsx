@@ -61,7 +61,7 @@ export function BottomNavigation({ navigation }: any) {
         barStyle={{ backgroundColor: '#010101' }}
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color }) => {
-            let size = 23;
+            const size = 23;
 
             if (route.name === "News") {
               return <Icon name="newspaper-variant-outline" size={size} color={color} />;
