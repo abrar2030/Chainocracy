@@ -25,23 +25,21 @@ function SideBarComponent() {
   const navigate = useNavigate();
   const [url, setUrl] = useState();
 
-  if (!authState || !authState.username) {
-    return (
-      <div>Loading ...</div>
-    );
-  }
-
   const onLogOutUser = () => {
     onLogOut!();
     navigate('/');
   }
 
   useEffect(() => {
+    if (!authState || !authState.username) {
+      return;
+    }
+    
     const userPhotoName = authState.name.toLowerCase().split(' ').join('.');
     if (imageList && imageList[userPhotoName]) {
       setUrl(imageList[userPhotoName] ?? 'default');
     }
-  }, []);
+  }, [authState, imageList]);
 
   return (
     <aside className="flex flex-col left-0 top-0 w-60 h-screen fixed transition-transform sm:translate-x-0" aria-label="Sidebar">
