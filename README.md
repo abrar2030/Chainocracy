@@ -1,5 +1,9 @@
 # Chainocracy
 
+[![CI Status](https://img.shields.io/github/workflow/status/abrar2030/Chainocracy/CI/main?label=CI)](https://github.com/abrar2030/Chainocracy/actions)
+[![Test Coverage](https://img.shields.io/codecov/c/github/abrar2030/Chainocracy/main?label=Coverage)](https://codecov.io/gh/abrar2030/Chainocracy)
+[![License](https://img.shields.io/github/license/abrar2030/Chainocracy)](https://github.com/abrar2030/Chainocracy/blob/main/LICENSE)
+
 A full-stack Web and Mobile application for American elections using Blockchain Technology. The system presents a user-friendly interface accessible via both web browsers and mobile platforms.
 
 <div align="center">
@@ -12,12 +16,15 @@ A full-stack Web and Mobile application for American elections using Blockchain 
 - [Overview](#overview)
 - [Project Structure](#project-structure)
 - [Features](#features)
+- [Feature Implementation Status](#feature-implementation-status)
 - [Technology Stack](#technology-stack)
 - [Installation and Setup](#installation-and-setup)
 - [Usage](#usage)
+- [Testing](#testing)
 - [Security](#security)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
+- [CI/CD Pipeline](#cicd-pipeline)
 - [License](#license)
 
 ## Overview
@@ -121,6 +128,43 @@ Comprehensive documentation using Sphinx, including:
 - Result visualization
 - Exportable reports
 
+## Feature Implementation Status
+
+| Feature | Status | Description | Planned Release |
+|---------|--------|-------------|----------------|
+| **Election Management** |
+| Election Creation | ✅ Implemented | Create and configure new elections | v1.0 |
+| Candidate Management | ✅ Implemented | Add and manage election candidates | v1.0 |
+| Election Parameters | ✅ Implemented | Configure start/end dates and eligibility | v1.0 |
+| Real-time Monitoring | 🔄 In Progress | Monitor election progress in real-time | v1.1 |
+| **Voter Experience** |
+| Voter Registration | ✅ Implemented | Register voters with secure verification | v1.0 |
+| Authentication | ✅ Implemented | Secure login with 2FA | v1.0 |
+| Vote Casting | ✅ Implemented | Cast votes securely | v1.0 |
+| Vote Verification | ✅ Implemented | Verify vote submission | v1.0 |
+| Result Viewing | 🔄 In Progress | View election results | v1.1 |
+| **Blockchain Integration** |
+| Vote Recording | ✅ Implemented | Record votes on blockchain | v1.0 |
+| Verification Process | ✅ Implemented | Verify vote integrity | v1.0 |
+| Double-vote Prevention | ✅ Implemented | Prevent duplicate voting | v1.0 |
+| Decentralized Validation | 🔄 In Progress | Validate votes across nodes | v1.1 |
+| **Security Features** |
+| Two-factor Authentication | ✅ Implemented | Secure 2FA for users | v1.0 |
+| Data Encryption | ✅ Implemented | Encrypt sensitive data | v1.0 |
+| QR Code Verification | ✅ Implemented | Verify identity with QR codes | v1.0 |
+| Audit Trails | 🔄 In Progress | Comprehensive logging | v1.1 |
+| **Analytics and Reporting** |
+| Election Statistics | 🔄 In Progress | Real-time statistics dashboard | v1.1 |
+| Voter Turnout Analysis | 📅 Planned | Analyze voter participation | v1.2 |
+| Geographic Patterns | 📅 Planned | Visualize voting patterns by region | v1.2 |
+| Result Visualization | 🔄 In Progress | Interactive result displays | v1.1 |
+| Exportable Reports | 📅 Planned | Export data in various formats | v1.2 |
+
+**Legend:**
+- ✅ Implemented: Feature is complete and available
+- 🔄 In Progress: Feature is currently being developed
+- 📅 Planned: Feature is planned for future release
+
 ## Technology Stack
 
 ### Backend
@@ -223,6 +267,45 @@ npm start
 5. Receive confirmation of vote submission
 6. View election results when published
 
+## Testing
+
+The project includes comprehensive testing to ensure reliability and security:
+
+### Unit Testing
+- Backend: Jest for API and service testing
+- Frontend: Vitest and React Testing Library for component testing
+- Mobile: Jest and React Native Testing Library
+
+### Integration Testing
+- API endpoint integration tests
+- Frontend-backend integration tests
+- Blockchain transaction verification tests
+
+### End-to-End Testing
+- Cypress for web application flows
+- Detox for mobile application flows
+
+### Security Testing
+- Penetration testing for API endpoints
+- Smart contract auditing
+- Authentication flow security testing
+
+To run tests:
+
+```bash
+# Backend tests
+cd backend-api
+npm test
+
+# Web frontend tests
+cd web-frontend
+npm test
+
+# Mobile frontend tests
+cd mobile-frontend
+npm test
+```
+
 ## Security
 
 Chainocracy implements multiple layers of security:
@@ -247,11 +330,66 @@ make html
 
 We welcome contributions to Chainocracy! Please follow these steps:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. **Fork the repository**
+   - Create your own copy of the project to work on
+
+2. **Create a feature branch**
+   - `git checkout -b feature/amazing-feature`
+   - Use descriptive branch names that reflect the changes
+
+3. **Make your changes**
+   - Follow the coding standards and guidelines
+   - Write clean, maintainable, and tested code
+   - Update documentation as needed
+
+4. **Commit your changes**
+   - `git commit -m 'Add some amazing feature'`
+   - Use clear and descriptive commit messages
+   - Reference issue numbers when applicable
+
+5. **Push to your branch**
+   - `git push origin feature/amazing-feature`
+
+6. **Open a Pull Request**
+   - Provide a clear description of the changes
+   - Link to any relevant issues
+   - Respond to review comments and make necessary adjustments
+
+### Development Guidelines
+
+- Follow the established code style and architecture
+- Write unit tests for new features
+- Update documentation for any changes
+- Ensure all tests pass before submitting a pull request
+- Keep pull requests focused on a single feature or fix
+
+### Code Review Process
+
+All submissions require review before being merged:
+
+1. Automated checks must pass (CI/CD pipeline)
+2. At least one maintainer must approve the changes
+3. Any review comments must be addressed
+
+## CI/CD Pipeline
+
+Chainocracy uses GitHub Actions for continuous integration and deployment:
+
+### Continuous Integration
+- Automated testing on each pull request and push to main
+- Code quality checks with ESLint and Prettier
+- Test coverage reporting with Codecov
+- Security scanning for vulnerabilities
+
+### Continuous Deployment
+- Automated deployment to staging environment on merge to main
+- Manual promotion to production after approval
+- Version tagging and release notes generation
+
+Current CI/CD Status:
+- Build: ![Build Status](https://img.shields.io/github/workflow/status/abrar2030/Chainocracy/CI/main?label=build)
+- Test Coverage: ![Coverage](https://img.shields.io/codecov/c/github/abrar2030/Chainocracy/main?label=coverage)
+- Code Quality: ![Code Quality](https://img.shields.io/codacy/grade/abrar2030/Chainocracy?label=code%20quality)
 
 ## License
 
