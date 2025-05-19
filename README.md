@@ -1,14 +1,13 @@
 # Chainocracy
 
-[![CI Status](https://img.shields.io/github/actions/workflow/status/abrar2030/Chainocracy/ci-cd.yml?branch=main&label=CI&logo=github)](https://github.com/abrar2030/Chainocracy/actions)
-[![CI Status](https://img.shields.io/github/workflow/status/abrar2030/Chainocracy/CI/main?label=CI)](https://github.com/abrar2030/Chainocracy/actions)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/abrar2030/Chainocracy/main.yml?branch=main&label=CI&logo=github)](https://github.com/abrar2030/Chainocracy/actions)
 [![Test Coverage](https://img.shields.io/codecov/c/github/abrar2030/Chainocracy/main?label=Coverage)](https://codecov.io/gh/abrar2030/Chainocracy)
 [![License](https://img.shields.io/github/license/abrar2030/Chainocracy)](https://github.com/abrar2030/Chainocracy/blob/main/LICENSE)
 
 A full-stack Web and Mobile application for American elections using Blockchain Technology. The system presents a user-friendly interface accessible via both web browsers and mobile platforms.
 
 <div align="center">
-  <img src="docs/Chainocracy.png" alt="Cross-Chain Asset Management" width="100%">
+  <img src="docs/Chainocracy.png" alt="Chainocracy Election System" width="100%">
 </div>
 
 > **Note**: This Project is currently under active development. Features and functionalities are being added and improved continuously to enhance user experience.
@@ -45,11 +44,12 @@ The project is organized into several main components:
 
 ```
 chainocracy/
-├── backend-api/           
-├── docs/                  
-├── mobile-frontend/       
-├── public/                
-└── web-frontend/          
+├── backend-api/           # Node.js/Express backend with blockchain implementation
+├── docs/                  # Technical documentation and API references
+├── mobile-frontend/       # React Native mobile application for voters
+├── web-frontend/          # React web application for committee members
+├── infrastructure/        # Deployment and infrastructure configuration
+└── .github/workflows/     # CI/CD pipeline configurations
 ```
 
 ### Backend API
@@ -388,12 +388,12 @@ Chainocracy uses GitHub Actions for continuous integration and deployment:
 - Version tagging and release notes generation
 
 Current CI/CD Status:
-- Build: ![Build Status](https://img.shields.io/github/workflow/status/abrar2030/Chainocracy/CI/main?label=build)
+- Build: ![Build Status](https://img.shields.io/github/actions/workflow/status/abrar2030/Chainocracy/main.yml?branch=main&label=build)
 - Test Coverage: ![Coverage](https://img.shields.io/codecov/c/github/abrar2030/Chainocracy/main?label=coverage)
-- Code Quality: ![Code Quality](https://img.shields.io/codacy/grade/abrar2030/Chainocracy?label=code%20quality)
+- Code Quality: ![Code Quality](https://img.shields.io/lgtm/grade/javascript/g/abrar2030/Chainocracy?label=code%20quality)
 
 ## License
 
-This project is licensed under the ISC License - see the LICENSE file for details.
+This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
 
 ---
