@@ -7,7 +7,7 @@
 A full-stack Web and Mobile application for American elections using Blockchain Technology. The system presents a user-friendly interface accessible via both web browsers and mobile platforms.
 
 <div align="center">
-  <img src="docs/Chainocracy.png" alt="Chainocracy Election System" width="100%">
+  <img src="docs/images/Chainocracy_dashboard.png" alt="Chainocracy Election System" width="100%">
 </div>
 
 > **Note**: This Project is currently under active development. Features and functionalities are being added and improved continuously to enhance user experience.
