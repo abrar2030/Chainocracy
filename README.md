@@ -4,8 +4,6 @@
 [![Test Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)](https://github.com/abrar2030/Chainocracy/actions)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-![Chainocracy Election System](https://raw.githubusercontent.com/abrar2030/Chainocracy/main/docs/images/banner.png)
-
 A full-stack Web and Mobile application for American elections using Blockchain Technology. The system presents a user-friendly interface accessible via both web browsers and mobile platforms.
 
 <div align="center">
