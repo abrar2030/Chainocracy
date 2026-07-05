@@ -1,4 +1,4 @@
-const PORT = "3010";
+const PORT = "3000";
 
 export const GLOBAL_VARIABLES = {
   LOCALHOST: `localhost:${PORT}`,

@@ -7,7 +7,7 @@ FROM node:20.11.1-alpine3.19 AS builder
 ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
-ARG VITE_API_URL=/api
+ARG VITE_API_BASE_URL=
 
 LABEL maintainer="QuantumBallot Security Team" \
       org.opencontainers.image.title="QuantumBallot Web Frontend" \
@@ -34,7 +34,7 @@ ENV NODE_ENV=production \
     NPM_CONFIG_UPDATE_NOTIFIER=false \
     NPM_CONFIG_FUND=false \
     NPM_CONFIG_AUDIT_LEVEL=moderate \
-    VITE_API_URL=${VITE_API_URL} \
+    VITE_API_BASE_URL=${VITE_API_BASE_URL} \
     VITE_SECURITY_HEADERS=true \
     VITE_CSP_ENABLED=true \
     VITE_HSTS_ENABLED=true

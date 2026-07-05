@@ -105,8 +105,13 @@ export default function AmericaMap() {
   }, [getRegionColor]);
 
   useEffect(() => {
-    const initial = constructProvincies(mapSize);
-    setMapProvincies(initial);
+    let active = true;
+    constructProvincies(mapSize).then((initial) => {
+      if (active) setMapProvincies(initial);
+    });
+    return () => {
+      active = false;
+    };
   }, [constructProvincies, mapSize]);
 
   return (

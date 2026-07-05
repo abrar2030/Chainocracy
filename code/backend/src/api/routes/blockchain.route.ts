@@ -75,7 +75,6 @@ module.exports = (blockchain: BlockChain, allNodes: string[]) => {
     next();
   };
 
-  // BUG FIX: original checkVote only checked truthiness — added proper type/range validation
   const checkVote = (identifier: string, choiceCode: number): boolean =>
     typeof identifier === "string" &&
     identifier.trim().length > 0 &&
@@ -239,7 +238,6 @@ module.exports = (blockchain: BlockChain, allNodes: string[]) => {
         if (!tx)
           return errorResponse(res, 400, "Transaction validation failed");
 
-        // BUG FIX: broadcast transaction to peers (was missing entirely)
         broadcastData("/transaction/broadcast", {
           identifier,
           electoralId: electoralEncrypted.CIPHER_TEXT,

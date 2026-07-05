@@ -5,8 +5,12 @@ import {
   TransitionPresets,
 } from "@react-navigation/stack";
 import { CandidateDetails } from "@screens/CandidateDetails";
+import { Dashboard } from "@screens/Dashboard";
+import { Home } from "@screens/Home";
 import { Login } from "@screens/Login";
 import { Registration } from "@screens/Registration";
+import { SignIn } from "@screens/SignIn";
+import { SignUp } from "@screens/SignUp";
 import ThankVote from "@screens/ThankVote";
 import { TwoFactor } from "@screens/TwoFactor";
 import { useEffect, useRef } from "react";
@@ -25,7 +29,7 @@ export function AppRoutes() {
     }
   }, [isLoggedIn]);
 
-  const initialRoute = authState?.authenticated ? "Menu" : "Login";
+  const initialRoute = authState?.authenticated ? "Dashboard" : "Home";
 
   return (
     <Navigator
@@ -34,6 +38,14 @@ export function AppRoutes() {
         headerShown: false,
       }}
     >
+      <Screen name="Home" component={Home} />
+
+      <Screen name="SignIn" component={SignIn} />
+
+      <Screen name="SignUp" component={SignUp} />
+
+      <Screen name="Dashboard" component={Dashboard} />
+
       <Screen name="Login" component={Login} />
 
       <Screen name="Menu" component={BottomNavigation} />
@@ -49,7 +61,7 @@ export function AppRoutes() {
         }}
       />
 
-      <Screen name="TwoFactor" component={TwoFactor} />
+      <Screen name="TwoFactor" component={TwoFactor as any} />
 
       <Screen name="Candidate Details" component={CandidateDetails} />
 

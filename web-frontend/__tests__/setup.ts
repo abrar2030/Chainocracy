@@ -1,5 +1,12 @@
-import { vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+import { afterEach, vi } from "vitest";
 import "@testing-library/jest-dom";
+
+// isolate is disabled in vitest.config for memory; clean the DOM between tests
+// so renders do not accumulate in document.body across a file.
+afterEach(() => {
+  cleanup();
+});
 
 // ResizeObserver mock
 global.ResizeObserver = vi.fn(() => ({
@@ -42,12 +49,19 @@ Object.assign(navigator, {
   },
 });
 
-// Mock window.location
+// Mock window.location with a full URL so same-origin checks (axios) work
 Object.defineProperty(window, "location", {
   writable: true,
   value: {
-    href: "/",
+    href: "http://localhost:3000/",
+    origin: "http://localhost:3000",
+    protocol: "http:",
+    host: "localhost:3000",
+    hostname: "localhost",
+    port: "3000",
     pathname: "/",
+    search: "",
+    hash: "",
     assign: vi.fn(),
     replace: vi.fn(),
     reload: vi.fn(),

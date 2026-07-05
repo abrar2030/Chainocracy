@@ -3,9 +3,10 @@
  * Centralized configuration for API endpoints, timeouts, and feature flags
  */
 
-// Default to localhost for development
-// In production, this should be configured via environment variables or app config
-const DEFAULT_API_BASE_URL = "http://192.168.0.38:3010";
+// Default targets the backend on port 3000 (its default). Emulators can reach
+// the host via localhost; a physical device must use the host machine's LAN IP,
+// for example http://192.168.0.38:3000. Override at runtime with updateApiBaseUrl.
+const DEFAULT_API_BASE_URL = "http://localhost:3000";
 
 export const Config = {
   // API Configuration

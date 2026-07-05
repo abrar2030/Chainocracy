@@ -15,11 +15,14 @@ const P2pNetwork = require("./p2p");
 const io = new Server(server);
 
 const PARAM = process.argv[2];
-const SERVER_PORT = PARAM ?? baseConfig.DEFAULT_PORT_SERVER;
+const SERVER_PORT =
+  PARAM ??
+  process.env.SERVER_PORT ??
+  process.env.PORT ??
+  baseConfig.DEFAULT_PORT_SERVER;
 const LOCALHOST = "http://localhost:";
 const HOSTNAME_ADDRESS = LOCALHOST + SERVER_PORT;
 
-// BUG FIX: .substr() is deprecated — replaced with .substring()
 const peerId = randomUUID().split("-").join("").substring(0, 4);
 const NODE_ADDRESS = PARAM ?? peerId;
 
@@ -30,6 +33,10 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.get("/health", (_req: any, res: any) => {
+  res.status(200).json({ status: "ok", uptime: process.uptime() });
+});
+
 // ── Blockchain initialisation ─────────────────────────────────────────────────
 
 let blockchain: BlockChain;
@@ -38,7 +45,6 @@ const initBlockchain = async () => {
   try {
     await connectToDB();
     blockchain = new BlockChain();
-    // BUG FIX: setNodeAddress is async — must be awaited before routes are used
     await blockchain.setNodeAddress(NODE_ADDRESS.toString());
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -191,6 +197,10 @@ const rl = readline.createInterface({
 });
 
 const askQuestion = () => {
+  // Only run the interactive CLI menu when attached to a terminal. In
+  // non-interactive environments (containers, CI) stdin is not a TTY and
+  // readline would throw ERR_USE_AFTER_CLOSE, so the server runs headless.
+  if (!process.stdin.isTTY) return;
   console.log('Press "M" or "m" to open the menu.');
   rl.question("", (answer) => {
     if (answer.toLowerCase() === "m") printHeader();
@@ -204,7 +214,6 @@ const serverDisplay = () => {
     `SOCKET: listening on *:${SERVER_PORT} | NODE ADDRESS: ${NODE_ADDRESS}`,
   );
   p2p.setMyPeerData({ peerId: NODE_ADDRESS, url: HOSTNAME_ADDRESS });
-  // BUG FIX: setNodeAddress is async — chain rejection to avoid unhandled promise warnings
   if (blockchain) {
     blockchain
       .setNodeAddress(NODE_ADDRESS.toString())

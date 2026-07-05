@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import type { Block, Candidate, Voter } from "../core/data_types";
-import type { Citizen, User } from "../../backend/src/committee/data_types";
+import type { Citizen, User } from "../../../backend/src/committee/data_types";
 
 const NODE_ADDRESS = process.argv[2] || "3000";
 const getBlockAddress = (str: string) => str + NODE_ADDRESS;
@@ -142,7 +142,6 @@ export async function deployVotersGenerated() {
   for await (const [key, value] of votersgenerateddb.iterator()) {
     if (value !== undefined) {
       await votersdb.put(key, value);
-      // BUG FIX: was storing identifier as value; store electoralId→identifier mapping
       await writeVoterCitizenRelation(value.electoralId, value.identifier);
     }
   }

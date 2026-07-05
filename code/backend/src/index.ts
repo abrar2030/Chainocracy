@@ -86,7 +86,6 @@ const startServer = async () => {
     console.log("Database connected");
 
     const blockchain = new BlockChain();
-    // BUG FIX: setNodeAddress is async (calls loadChain) — must be awaited
     await blockchain.setNodeAddress(PORT.toString());
     console.log("Blockchain initialized");
 
@@ -95,7 +94,6 @@ const startServer = async () => {
     app.use("/api", apiRouter);
     console.log("API routes mounted");
 
-    // BUG FIX: error handler and 404 must be registered AFTER all routes
     app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       console.error("Error:", err.message);
       res.status(500).json({

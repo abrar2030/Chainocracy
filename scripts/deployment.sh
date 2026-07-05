@@ -57,8 +57,8 @@ deploy_backend() {
     local env=$1
     section "Deploying Backend to $env"
 
-    if [ -d "backend" ]; then
-        cd backend
+    if [ -d "code/backend" ]; then
+        cd code/backend
 
         # Build for production
         echo "Building backend for deployment..."

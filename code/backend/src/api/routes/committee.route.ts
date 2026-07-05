@@ -120,7 +120,6 @@ router.get(
   "/clear-users",
   asyncHandler(async (_req: Request, res: Response) => {
     await committee.eraseUsers();
-    // BUG FIX: was returning stale in-memory list — now awaits fresh read from DB
     const users = await committee.getUsers();
     return res.json({ users, note: "Request accepted ..." });
   }),
@@ -429,7 +428,6 @@ router.post(
 
 router.get("/refresh-token", verifyJWT, (req: Request, res: Response) => {
   try {
-    // BUG FIX: cookie parsing was broken for tokens containing '='
     // (split("=")[1] drops everything after the second '=')
     // Use req.cookies (populated by cookie-parser) instead
     const refreshToken = req.cookies?.jwt;

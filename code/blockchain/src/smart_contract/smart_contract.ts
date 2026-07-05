@@ -8,7 +8,7 @@ import type {
 import type {
   Announcement,
   Citizen,
-} from "../../backend/src/committee/data_types";
+} from "../../../backend/src/committee/data_types";
 import CryptoBlockchain from "../crypto/cryptoBlockchain";
 import {
   clearResults,

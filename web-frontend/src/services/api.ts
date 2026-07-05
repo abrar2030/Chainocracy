@@ -4,7 +4,7 @@ import { GLOBAL_VARIABLES, TOKEN_KEY } from "@/global/globalVariables";
 
 // Use environment variable if available, fallback to GLOBAL_VARIABLES
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || `http://${GLOBAL_VARIABLES.LOCALHOST}`;
+  import.meta.env.VITE_API_BASE_URL ?? `http://${GLOBAL_VARIABLES.LOCALHOST}`;
 const API_URL = `${API_BASE_URL}/api`;
 const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || "30000", 10);
 

@@ -11,10 +11,10 @@ echo "----------------------------------------"
 
 # --- Configuration ---
 COMPONENTS=(
-  "backend"
+  "code/backend"
+  "code/blockchain"
   "web-frontend"
   "mobile-frontend"
-  "smart_contract"
 )
 
 # Function to check if a command exists

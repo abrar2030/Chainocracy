@@ -69,7 +69,7 @@ install_doc_dependencies() {
 generate_api_docs() {
     section "Generating API Documentation"
 
-    if [ -d "backend" ]; then
+    if [ -d "code/backend" ]; then
         echo "Generating API documentation..."
 
         # Create docs directory if it doesn't exist
@@ -82,7 +82,7 @@ generate_api_docs() {
         fi
 
         # Generate API documentation using TypeDoc
-        cd backend
+        cd code/backend
         npx typedoc --out ../docs/api src/
 
         echo -e "${GREEN}API documentation generated successfully${NC}"

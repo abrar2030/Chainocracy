@@ -2,4 +2,4 @@
 # Delegates to the full compose configuration in infrastructure/docker/
 
 include:
-  - path: infrastructure/docker/docker-compose.yml
+  - path: docker/docker-compose.yml

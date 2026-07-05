@@ -115,9 +115,9 @@ install_expo() {
 setup_backend() {
     section "Setting up Backend Environment"
 
-    if [ -d "backend" ]; then
+    if [ -d "code/backend" ]; then
         echo "Setting up backend environment..."
-        cd backend
+        cd code/backend
 
         # Install dependencies
         echo "Installing backend dependencies..."

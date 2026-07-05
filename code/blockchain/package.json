@@ -1,0 +1,19 @@
+{
+  "name": "quantumballot-blockchain",
+  "version": "1.0.0",
+  "description": "QuantumBallot blockchain core (chain, crypto, leveldb, smart contract)",
+  "private": true,
+  "main": "src/core/blockchain.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "crypto-js": "^4.1.1",
+    "level": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5"
+  }
+}

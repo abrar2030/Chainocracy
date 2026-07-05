@@ -51,6 +51,21 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        qb: {
+          ink: "#0E1730",
+          ink2: "#16224A",
+          primary: "#2E43C9",
+          primary600: "#2334A6",
+          accent: "#17B6A5",
+          paper: "#F4F6FC",
+          line: "#E1E5F2",
+          muted: "#5C668A",
+        },
+      },
+      fontFamily: {
+        display: ['"Space Grotesk"', "system-ui", "sans-serif"],
+        sans: ['"Inter"', "system-ui", "sans-serif"],
+        mono: ['"JetBrains Mono"', "ui-monospace", "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",

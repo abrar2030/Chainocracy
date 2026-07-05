@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 # Dockerfile for QuantumBallot Backend API
-# Implements financial-grade security best practices and compliance requirements
+# Build context is the repository root (see docker-compose build.context: ../..).
+# The backend compiles the blockchain package alongside itself (its tsconfig
+# includes ../blockchain/src), so both packages are installed and copied.
 
 FROM node:20.11.1-alpine3.19 AS builder
 
@@ -8,57 +10,25 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
 
-LABEL maintainer="QuantumBallot Security Team" \
-      org.opencontainers.image.title="QuantumBallot Backend API" \
-      org.opencontainers.image.description="Secure backend API for QuantumBallot election platform" \
+LABEL org.opencontainers.image.title="QuantumBallot Backend API" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.revision="${VCS_REF}" \
-      org.opencontainers.image.vendor="QuantumBallot" \
-      security.scan.required="true" \
-      compliance.level="financial-grade"
+      org.opencontainers.image.revision="${VCS_REF}"
 
-RUN apk update && \
-    apk upgrade && \
-    apk add --no-cache \
-        dumb-init \
-        ca-certificates \
-        tzdata && \
-    rm -rf /var/cache/apk/* && \
-    addgroup -g 1001 -S nodegroup && \
-    adduser -S -D -H -u 1001 -s /sbin/nologin -G nodegroup nodeuser
+# Build toolchain for native modules (for example bcrypt).
+RUN apk add --no-cache python3 make g++
 
-ENV NODE_ENV=production \
-    NODE_PORT=3000 \
-    SERVER_PORT=3002 \
-    DIR=/usr/app \
-    NPM_CONFIG_CACHE=/tmp/.npm \
-    NPM_CONFIG_UPDATE_NOTIFIER=false \
-    NPM_CONFIG_FUND=false \
-    NPM_CONFIG_AUDIT_LEVEL=moderate \
-    HELMET_ENABLED=true \
-    RATE_LIMIT_ENABLED=true \
-    LOG_LEVEL=info \
-    LOG_FORMAT=json \
-    HEALTH_CHECK_ENABLED=true
+WORKDIR /app
 
-WORKDIR ${DIR}
-RUN chown -R nodeuser:nodegroup ${DIR}
+# Install dependencies for both packages first, for better layer caching.
+COPY code/backend/package*.json ./code/backend/
+COPY code/blockchain/package*.json ./code/blockchain/
+RUN cd code/backend && npm ci --no-audit --no-fund
+RUN cd code/blockchain && npm install --no-audit --no-fund
 
-COPY --chown=nodeuser:nodegroup package*.json ./
-
-USER nodeuser
-
-RUN npm ci --no-optional --no-audit --no-fund && \
-    npm cache clean --force
-
-COPY --chown=nodeuser:nodegroup . .
-
-RUN npm run lint && \
-    npm run security-audit && \
-    npm run build && \
-    npm prune --omit=dev && \
-    rm -rf src/ tests/ *.ts tsconfig.json .eslintrc.js
+# Copy sources and build (tsc emits code/backend/dist/{backend,blockchain}).
+COPY code/ ./code/
+RUN cd code/backend && npm run build && npm prune --omit=dev
 
 FROM node:20.11.1-alpine3.19
 
@@ -66,71 +36,50 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
 
-LABEL maintainer="QuantumBallot Security Team" \
-      org.opencontainers.image.title="QuantumBallot Backend API" \
-      org.opencontainers.image.description="Secure backend API for QuantumBallot election platform" \
+LABEL org.opencontainers.image.title="QuantumBallot Backend API" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.revision="${VCS_REF}" \
-      security.scan.required="true" \
-      compliance.level="financial-grade"
+      org.opencontainers.image.revision="${VCS_REF}"
 
-RUN apk update && \
-    apk upgrade && \
-    apk add --no-cache \
-        dumb-init \
-        ca-certificates \
-        tzdata \
-        curl && \
+RUN apk update && apk upgrade && \
+    apk add --no-cache dumb-init ca-certificates tzdata curl && \
     rm -rf /var/cache/apk/* && \
     addgroup -g 1001 -S nodegroup && \
-    adduser -S -D -H -u 1001 -s /sbin/nologin -G nodegroup nodeuser && \
-    rm -rf /usr/share/man/* \
-           /usr/share/doc/* \
-           /var/cache/apk/* \
-           /tmp/* \
-           /var/tmp/*
+    adduser -S -D -H -u 1001 -s /sbin/nologin -G nodegroup nodeuser
 
 ENV NODE_ENV=production \
+    SERVER_PORT=3000 \
     NODE_PORT=3000 \
-    SERVER_PORT=3002 \
     DIR=/usr/app \
     NODE_OPTIONS="--max-old-space-size=512 --no-warnings" \
-    NODE_DISABLE_COLORS=1 \
     NPM_CONFIG_UPDATE_NOTIFIER=false \
     NPM_CONFIG_FUND=false
 
-WORKDIR ${DIR}
-RUN chown -R nodeuser:nodegroup ${DIR} && \
-    chmod 750 ${DIR}
+WORKDIR /usr/app
+
+# The backend's node_modules already contains the blockchain's runtime deps
+# (crypto-js, level), so the compiled blockchain code under dist/blockchain
+# resolves them from here.
+COPY --from=builder --chown=nodeuser:nodegroup /app/code/backend/dist ./dist
+COPY --from=builder --chown=nodeuser:nodegroup /app/code/backend/node_modules ./node_modules
+COPY --from=builder --chown=nodeuser:nodegroup /app/code/backend/package*.json ./
+
+# Liveness probe hits the /health route the server exposes.
+RUN printf '%s\n' \
+    "const http = require('http');" \
+    "const port = process.env.SERVER_PORT || process.env.NODE_PORT || 3000;" \
+    "const req = http.request({ host: 'localhost', port, path: '/health', timeout: 2000, method: 'GET' }, (res) => process.exit(res.statusCode === 200 ? 0 : 1));" \
+    "req.on('error', () => process.exit(1));" \
+    "req.on('timeout', () => { req.destroy(); process.exit(1); });" \
+    "req.end();" \
+    > /usr/app/healthcheck.js && chmod 755 /usr/app/healthcheck.js
 
 USER nodeuser
 
-COPY --from=builder --chown=nodeuser:nodegroup ${DIR}/build ./build
-COPY --from=builder --chown=nodeuser:nodegroup ${DIR}/package*.json ./
-COPY --from=builder --chown=nodeuser:nodegroup ${DIR}/node_modules ./node_modules
-
-RUN printf '%s\n' \
-    "const http = require('http');" \
-    "const options = { host: 'localhost', port: process.env.NODE_PORT || 3000, path: '/health', timeout: 2000, method: 'GET' };" \
-    "const request = http.request(options, (res) => {" \
-    "  if (res.statusCode === 200) { process.exit(0); } else { process.exit(1); }" \
-    "});" \
-    "request.on('error', () => process.exit(1));" \
-    "request.on('timeout', () => { request.destroy(); process.exit(1); });" \
-    "request.end();" \
-    > /usr/app/healthcheck.js
-
-RUN chmod 644 package*.json && \
-    find build -type f -exec chmod 644 {} \; && \
-    find build -type d -exec chmod 755 {} \; && \
-    chmod 755 healthcheck.js && \
-    chmod -R a-w ${DIR}/node_modules
-
-EXPOSE ${NODE_PORT}
+EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD node /usr/app/healthcheck.js
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "--max-old-space-size=512", "--no-warnings", "build/network.js"]
+CMD ["node", "--max-old-space-size=512", "--no-warnings", "dist/backend/src/network/network.js"]

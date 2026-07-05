@@ -11,7 +11,7 @@ echo "----------------------------------------"
 
 # --- Configuration ---
 COMPONENTS=(
-  "backend"
+  "code/backend"
   "web-frontend"
   "mobile-frontend"
 )
@@ -43,9 +43,9 @@ build_component() {
 }
 
 # Build all components
-build_component "backend"
-build_component "web-frontend"
-build_component "mobile-frontend"
+for component in "${COMPONENTS[@]}"; do
+  build_component "$component"
+done
 
 echo "----------------------------------------"
 echo "QuantumBallot Project Build completed successfully!"

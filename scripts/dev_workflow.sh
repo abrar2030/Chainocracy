@@ -61,8 +61,8 @@ start_dev_server() {
     case $component in
         "backend")
             section "Starting Backend Development Server"
-            if [ -d "backend" ]; then
-                cd backend
+            if [ -d "code/backend" ]; then
+                cd code/backend
                 echo "Starting backend server..."
                 npm run dev
             else
@@ -118,8 +118,8 @@ run_tests() {
     case $component in
         "backend")
             section "Running Backend Tests"
-            if [ -d "backend" ]; then
-                cd backend
+            if [ -d "code/backend" ]; then
+                cd code/backend
                 echo "Running backend tests..."
                 npm test
             else
@@ -153,9 +153,9 @@ run_tests() {
             section "Running All Tests"
 
             # Run backend tests
-            if [ -d "backend" ]; then
+            if [ -d "code/backend" ]; then
                 echo "Running backend tests..."
-                (cd backend && npm test)
+                (cd code/backend && npm test)
                 echo -e "${GREEN}Backend tests completed${NC}"
             else
                 echo -e "${YELLOW}Backend directory not found, skipping tests${NC}"
@@ -196,8 +196,8 @@ run_linting() {
     case $component in
         "backend")
             section "Running Backend Linting"
-            if [ -d "backend" ]; then
-                cd backend
+            if [ -d "code/backend" ]; then
+                cd code/backend
                 echo "Running backend linting..."
                 npm run lint
             else
@@ -231,9 +231,9 @@ run_linting() {
             section "Running All Linting"
 
             # Run backend linting
-            if [ -d "backend" ]; then
+            if [ -d "code/backend" ]; then
                 echo "Running backend linting..."
-                (cd backend && npm run lint)
+                (cd code/backend && npm run lint)
                 echo -e "${GREEN}Backend linting completed${NC}"
             else
                 echo -e "${YELLOW}Backend directory not found, skipping linting${NC}"
@@ -274,8 +274,8 @@ build_production() {
     case $component in
         "backend")
             section "Building Backend for Production"
-            if [ -d "backend" ]; then
-                cd backend
+            if [ -d "code/backend" ]; then
+                cd code/backend
                 echo "Building backend for production..."
                 npm run build
                 echo -e "${GREEN}Backend build completed${NC}"
@@ -312,9 +312,9 @@ build_production() {
             section "Building All Components for Production"
 
             # Build backend
-            if [ -d "backend" ]; then
+            if [ -d "code/backend" ]; then
                 echo "Building backend for production..."
-                (cd backend && npm run build)
+                (cd code/backend && npm run build)
                 echo -e "${GREEN}Backend build completed${NC}"
             else
                 echo -e "${YELLOW}Backend directory not found, skipping build${NC}"

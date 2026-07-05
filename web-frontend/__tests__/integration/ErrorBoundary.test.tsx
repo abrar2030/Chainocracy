@@ -64,21 +64,24 @@ describe("ErrorBoundary Component", () => {
   });
 
   it("Try Again button resets error state", () => {
-    const { rerender } = render(
+    let shouldThrow = true;
+    const Child = () => {
+      if (shouldThrow) throw new Error("Test error");
+      return <div data-testid="child">Child rendered</div>;
+    };
+
+    render(
       <ErrorBoundary>
-        <ThrowingComponent shouldThrow={true} />
+        <Child />
       </ErrorBoundary>,
     );
     expect(screen.getByText(/Something went wrong/i)).toBeInTheDocument();
 
+    // The underlying problem is resolved, then the user retries.
+    shouldThrow = false;
     fireEvent.click(screen.getByRole("button", { name: /Try Again/i }));
 
-    rerender(
-      <ErrorBoundary>
-        <ThrowingComponent shouldThrow={false} />
-      </ErrorBoundary>,
-    );
-    // After reset, child renders again
+    expect(screen.getByTestId("child")).toBeInTheDocument();
     expect(screen.queryByText(/Something went wrong/i)).not.toBeInTheDocument();
   });
 });

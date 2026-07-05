@@ -10,11 +10,15 @@ echo "Starting QuantumBallot Application Components..."
 echo "----------------------------------------"
 
 # --- Configuration ---
+# Each entry is "directory:npm-script".
 COMPONENTS=(
-  "backend"
-  "web-frontend"
-  "mobile-frontend"
+  "code/backend:dev"
+  "web-frontend:dev"
+  "mobile-frontend:start"
 )
+
+# Absolute log directory, resolved before any directory changes.
+LOG_DIR="$(pwd)/logs"
 
 # Function to start a component
 start_component() {
@@ -28,7 +32,7 @@ start_component() {
       if [ -f "package.json" ]; then
         echo "Executing '$start_command' in $component_dir..."
         # Run in background and redirect output to a log file
-        npm run "$start_command" > "../logs/$component_dir.log" 2>&1 &
+        npm run "$start_command" > "$LOG_DIR/$(basename "$component_dir").log" 2>&1 &
         echo "$component_dir started (PID: $!)"
       else
         echo "Warning: package.json not found in $component_dir. Skipping start."
@@ -40,12 +44,12 @@ start_component() {
 }
 
 # Create logs directory if it doesn't exist
-mkdir -p logs
+mkdir -p "$LOG_DIR"
 
 # Start all components
-start_component "backend" "dev" # Assuming 'npm run dev' for backend
-start_component "web-frontend" "dev" # Assuming 'npm run dev' for web frontend
-start_component "mobile-frontend" "start" # Assuming 'npm run start' for mobile (e.g., Expo)
+for entry in "${COMPONENTS[@]}"; do
+  start_component "${entry%%:*}" "${entry##*:}"
+done
 
 echo "----------------------------------------"
 echo "QuantumBallot services are running in the background."

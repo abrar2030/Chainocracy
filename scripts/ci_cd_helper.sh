@@ -146,9 +146,9 @@ run_local_ci() {
     echo "Running local CI checks..."
 
     # Check if backend exists and run its checks
-    if [ -d "backend" ]; then
+    if [ -d "code/backend" ]; then
         echo "Running backend CI checks..."
-        cd backend
+        cd code/backend
 
         # Install dependencies if needed
         if [ ! -d "node_modules" ]; then

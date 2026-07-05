@@ -5,7 +5,7 @@ kind: Kustomization
 resources:
   - ../../base
 
-namespace: QuantumBallot-dev
+namespace: quantumballot-dev
 
 # Environment-specific patches or configurations
 patchesStrategicMerge:
@@ -33,7 +33,7 @@ configMapGenerator:
     literals:
       - node_env=development
       - log_level=debug
-      - blockchain_node_url=http://blockchain-node-service.QuantumBallot-dev:26657
+      - blockchain_node_url=http://blockchain-node-service.quantumballot-dev:26657
 
   - name: frontend-config
     behavior: merge
@@ -64,12 +64,10 @@ secretGenerator:
       - firebase_messaging_sender_id=123456789
       - firebase_app_id=1:123456789:web:abcdef123456
 
-# Configure resource patches
+# Apply the environment-specific ingress patches that exist in this overlay
 patches:
-  - path: resource-patch.yaml
-    target:
-      kind: Deployment
-      labelSelector: "app in (QuantumBallot-backend, QuantumBallot-frontend-web)"
+  - path: backend-ingress-patch.yaml
+  - path: frontend-web-ingress-patch.yaml
 
 # Configure replicas for dev environment
 replicas:

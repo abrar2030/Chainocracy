@@ -1,5 +1,3 @@
-// FIX 1: corrected import depth — api/ is 3 levels from code/, not 4
-// FIX 3: router created INSIDE factory, not at module scope (prevents double-registration)
 import type BlockChain from "../../../blockchain/src/core/blockchain";
 
 const express = require("express");

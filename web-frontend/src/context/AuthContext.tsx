@@ -40,7 +40,8 @@ const provinces = [
   "Zaire",
 ];
 
-export const API_URL = "http://localhost:3010";
+export const API_URL =
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000";
 
 interface AuthState {
   token: string | null;
@@ -125,7 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     loadToken();
   }, []);
 
-  const URL_AUTH = "http://localhost:3010/api/committee";
+  const URL_AUTH = `${API_URL}/api/committee`;
 
   const login = useCallback(async (username: string, password: string) => {
     try {

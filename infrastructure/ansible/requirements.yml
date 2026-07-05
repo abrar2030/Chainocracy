@@ -1,0 +1,7 @@
+---
+# Ansible collection requirements for QuantumBallot infrastructure.
+# Install with: ansible-galaxy collection install -r requirements.yml
+collections:
+  - name: community.general
+  - name: community.aws
+  - name: amazon.aws

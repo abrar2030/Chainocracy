@@ -11,7 +11,7 @@ echo "----------------------------------------"
 
 # --- Configuration ---
 COMPONENTS=(
-  "backend"
+  "code/backend"
   "web-frontend"
   "mobile-frontend"
 )

@@ -52,7 +52,6 @@ class BlockChain {
     }
   }
 
-  // BUG FIX: was incorrectly typed as non-async in original — it awaits loadChain
   public async setNodeAddress(nodeAddress: string): Promise<void> {
     this.nodeAddress = nodeAddress;
     await this.loadChain();

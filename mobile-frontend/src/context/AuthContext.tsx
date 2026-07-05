@@ -1,5 +1,12 @@
 import * as SecureStore from "expo-secure-store";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  type Dispatch,
+  type SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import axios from "src/api/axios";
 import type { HashMap } from "src/data_types";
 import { Config } from "../constants/config";
@@ -17,7 +24,7 @@ interface AuthProps {
   onRegister?: (body: any) => Promise<any>;
   onLogOut?: () => Promise<any>;
   imageList: HashMap<any>;
-  setImageList: (imageList: HashMap<any> | undefined) => void;
+  setImageList: Dispatch<SetStateAction<HashMap<any>>>;
   isLoading: boolean;
 }
 

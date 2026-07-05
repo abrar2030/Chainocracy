@@ -2,7 +2,17 @@
 
 import { geoEquirectangular, geoPath } from "d3-geo";
 import type { SVGProps } from "react";
-import geoJson from "../assets/america.json";
+import geoJsonUrl from "../assets/america.json?url";
+
+let geoJsonCache: { features: any[] } | null = null;
+
+const loadGeoJson = async (): Promise<{ features: any[] }> => {
+  if (!geoJsonCache) {
+    const res = await fetch(geoJsonUrl);
+    geoJsonCache = await res.json();
+  }
+  return geoJsonCache as { features: any[] };
+};
 
 export interface ICoffeeDistributor {
   Rank: string;
@@ -37,7 +47,10 @@ const colors = {
   },
 };
 
-const constructProvincies = (mapSize: [number, number]): IMapProvincy[] => {
+const constructProvincies = async (
+  mapSize: [number, number],
+): Promise<IMapProvincy[]> => {
+  const geoJson = await loadGeoJson();
   const projection = geoEquirectangular().fitSize(mapSize, geoJson as any);
   const geoPathGenerator = geoPath().projection(projection);
 
