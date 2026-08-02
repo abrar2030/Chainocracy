@@ -7,9 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import useCoffeeDataAmerica, {
-  type IMapProvincy,
-} from "../../hooks/useCoffeeDataAmerica";
+import useUSStatesMap, { type IStateFeature } from "../../hooks/useUSStatesMap";
 import "./AmericaMap.scss";
 import { useAuth } from "@/context/AuthContext";
 import Tooltip from "../Tooltip/Tooltip";
@@ -17,45 +15,39 @@ import Tooltip from "../Tooltip/Tooltip";
 export default function AmericaMap() {
   const tooltip = useRef<HTMLDivElement>(null);
   const [tooltipContent, setTooltipContent] = useState<ReactNode>(null);
-  const [mapProvincies, setMapProvincies] = useState<IMapProvincy[]>([]);
+  const [mapStates, setMapStates] = useState<IStateFeature[]>([]);
   const { mapData, partiesData } = useAuth();
 
   const mapSize: [number, number] = useMemo(() => [400, 400], []);
 
-  const {
-    constructProvincies,
-    isMatchCoffeeRegion,
-    getRegionColor,
-    getRegionHoverColor,
-  } = useCoffeeDataAmerica();
+  const { constructStates, isMatchState, getRegionColor, getRegionHoverColor } =
+    useUSStatesMap();
 
   const renderTooltipContent = useCallback(
-    (provincy: IMapProvincy): ReactNode => {
+    (state: IStateFeature): ReactNode => {
       return (
-        <div className="WorldMap--tooltip">
-          <div className="WorldMap--tooltip--title">{provincy.Nome_Prov_}</div>
+        <div className="AmericaMap--tooltip">
+          <div className="AmericaMap--tooltip--title">{state.STATE_NAME}</div>
           <hr />
           <div className="p-3">
-            <div className="WorldMap--tooltip--content">
+            <div className="AmericaMap--tooltip--content">
               <ul>
                 {partiesData?.map((e: string, index: number) => {
                   if (
-                    mapData?.[provincy.Nome_Prov_] !== undefined &&
-                    mapData[provincy.Nome_Prov_][e] !== undefined
+                    mapData?.[state.STATE_NAME] !== undefined &&
+                    mapData[state.STATE_NAME][e] !== undefined
                   ) {
                     return (
                       <li key={index}>
                         {`${e}: `}
-                        {mapData[provincy.Nome_Prov_][e]}
+                        {mapData[state.STATE_NAME][e]}
                       </li>
                     );
                   }
                   return null;
                 })}
-                {mapData?.[provincy.Nome_Prov_]?.sum !== undefined && (
-                  <span>
-                    Total # of votes: {mapData[provincy.Nome_Prov_].sum}
-                  </span>
+                {mapData?.[state.STATE_NAME]?.sum !== undefined && (
+                  <span>Total # of votes: {mapData[state.STATE_NAME].sum}</span>
                 )}
               </ul>
             </div>
@@ -66,37 +58,35 @@ export default function AmericaMap() {
     [mapData, partiesData],
   );
 
-  const handleMouseOverCountry = useCallback(
-    (evt: React.MouseEvent<SVGPathElement>, provincy: IMapProvincy) => {
+  const handleMouseOverState = useCallback(
+    (evt: React.MouseEvent<SVGPathElement>, state: IStateFeature) => {
       if (tooltip.current) {
         tooltip.current.style.display = "block";
         tooltip.current.style.left = `${evt.pageX + 10}px`;
         tooltip.current.style.top = `${evt.pageY + 10}px`;
-        setTooltipContent(renderTooltipContent(provincy));
+        setTooltipContent(renderTooltipContent(state));
       }
-      setMapProvincies((prev) =>
+      setMapStates((prev) =>
         prev.map((m) => ({
           ...m,
           svg: {
             ...m.svg,
-            stroke: isMatchCoffeeRegion(m, provincy)
+            stroke: isMatchState(m, state)
               ? getRegionHoverColor()
               : m.svg.stroke,
-            fill: isMatchCoffeeRegion(m, provincy)
-              ? getRegionHoverColor()
-              : m.svg.fill,
+            fill: isMatchState(m, state) ? getRegionHoverColor() : m.svg.fill,
           },
         })),
       );
     },
-    [renderTooltipContent, isMatchCoffeeRegion, getRegionHoverColor],
+    [renderTooltipContent, isMatchState, getRegionHoverColor],
   );
 
-  const handleMouseLeaveCountry = useCallback(() => {
+  const handleMouseLeaveState = useCallback(() => {
     if (tooltip.current) {
       tooltip.current.style.display = "none";
     }
-    setMapProvincies((prev) =>
+    setMapStates((prev) =>
       prev.map((m) => ({
         ...m,
         svg: { ...m.svg, stroke: getRegionColor(), fill: getRegionColor() },
@@ -106,13 +96,13 @@ export default function AmericaMap() {
 
   useEffect(() => {
     let active = true;
-    constructProvincies(mapSize).then((initial) => {
-      if (active) setMapProvincies(initial);
+    constructStates(mapSize).then((initial) => {
+      if (active) setMapStates(initial);
     });
     return () => {
       active = false;
     };
-  }, [constructProvincies, mapSize]);
+  }, [constructStates, mapSize]);
 
   return (
     <div className="AmericaMap">
@@ -125,13 +115,13 @@ export default function AmericaMap() {
         height={mapSize[1]}
         stroke="black"
       >
-        {mapProvincies.map((provincy) => (
+        {mapStates.map((state) => (
           <path
-            id={provincy.OBJECTID.toString()}
-            key={provincy.Nome_Prov_}
-            {...provincy.svg}
-            onMouseMove={(e) => handleMouseOverCountry(e, provincy)}
-            onMouseLeave={handleMouseLeaveCountry}
+            id={state.OBJECTID.toString()}
+            key={state.STATE_NAME}
+            {...state.svg}
+            onMouseMove={(e) => handleMouseOverState(e, state)}
+            onMouseLeave={handleMouseLeaveState}
             stroke="white"
             strokeWidth={0.5}
           />

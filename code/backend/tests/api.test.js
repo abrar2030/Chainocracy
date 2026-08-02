@@ -176,7 +176,7 @@ describe("API Routes", () => {
         name: "New Citizen",
         email: "new@example.com",
         address: "Address",
-        province: "Luanda",
+        province: "California",
         password: "pass",
       });
       expect(res.status).toBe(201);

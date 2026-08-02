@@ -9,22 +9,36 @@ import express, {
 import cookieParser from "cookie-parser";
 import BlockChain from "../../blockchain/src/core/blockchain";
 import { closeDB, connectToDB } from "../../blockchain/src/leveldb";
+import allowedOrigins from "./config/allowedOrigins";
 
-dotenv.config({ path: path.join(__dirname, "../../.env") });
+dotenv.config({ path: path.join(__dirname, "../.env") });
 
-const REQUIRED_ENV_VARS = [
-  "SECRET_KEY_IDENTIFIER",
-  "SECRET_IV_IDENTIFIER",
-  "SECRET_KEY_VOTES",
-  "SECRET_IV_VOTES",
-  "ACCESS_TOKEN_SECRET",
-  "REFRESH_TOKEN_SECRET",
-];
+// Development-only fallback values. If a required secret is not set via
+// .env, a fixed insecure default is used instead of leaving it undefined -
+// this prevents startup/runtime crashes (e.g. jwt.sign throwing
+// "secretOrPrivateKey must have a value") when a .env file is missing,
+// misplaced, or incomplete. These defaults are NOT safe for production;
+// set real values in .env before deploying anywhere real.
+const DEV_FALLBACKS: Record<string, string> = {
+  SECRET_KEY_IDENTIFIER:
+    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  SECRET_IV_IDENTIFIER: "0123456789abcdef0123456789abcdef",
+  SECRET_KEY_VOTES:
+    "fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+  SECRET_IV_VOTES: "fedcba9876543210fedcba9876543210",
+  ACCESS_TOKEN_SECRET: "dev-only-insecure-access-token-secret-change-me",
+  REFRESH_TOKEN_SECRET: "dev-only-insecure-refresh-token-secret-change-me",
+};
+
+const REQUIRED_ENV_VARS = Object.keys(DEV_FALLBACKS);
 const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
 if (missingVars.length > 0) {
   console.warn(
-    `⚠ Missing env vars: ${missingVars.join(", ")}. Copy .env.example → .env`,
+    `⚠ Using insecure development defaults for: ${missingVars.join(", ")}. Copy .env.example to .env in code/backend and set real values before this is used for anything beyond local testing.`,
   );
+  for (const key of missingVars) {
+    process.env[key] = DEV_FALLBACKS[key];
+  }
 }
 
 const app = express();
@@ -33,20 +47,6 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-const allowedOrigins = [
-  "http://localhost:3007",
-  "http://localhost:3010",
-  "http://127.0.0.1:5500",
-  "http://localhost:3500",
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:3002",
-  "http://localhost:3003",
-  "http://localhost:3004",
-  "http://localhost:3005",
-  "http://localhost:3006",
-];
 
 app.use(
   cors({

@@ -38,9 +38,9 @@ describe("SignIn page", () => {
   it("renders the sign-in form", () => {
     renderSignIn();
     expect(
-      screen.getByRole("heading", { name: /Committee sign in/i }),
+      screen.getByRole("heading", { name: /Sign in/i }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/Username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Electoral ID/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
   });
 
@@ -48,7 +48,7 @@ describe("SignIn page", () => {
     renderSignIn();
     fireEvent.click(screen.getByRole("button", { name: /^Sign in$/i }));
     expect(
-      screen.getByText(/Enter your username and password/i),
+      screen.getByText(/Enter your Electoral ID and password/i),
     ).toBeInTheDocument();
     expect(onLogin).not.toHaveBeenCalled();
   });
@@ -56,24 +56,36 @@ describe("SignIn page", () => {
   it("calls onLogin and navigates to the dashboard on success", async () => {
     onLogin.mockResolvedValue({ data: { accessToken: "token-123" } });
     renderSignIn();
-    fill(/Username/i, "committee");
+    fill(/Electoral ID/i, "YJK883542");
     fill(/Password/i, "secret");
     fireEvent.click(screen.getByRole("button", { name: /^Sign in$/i }));
 
     await waitFor(() =>
-      expect(onLogin).toHaveBeenCalledWith("committee", "secret"),
+      expect(onLogin).toHaveBeenCalledWith("YJK883542", "secret"),
     );
     await waitFor(() => expect(navigate).toHaveBeenCalledWith("/dashboard"));
   });
 
   it("shows an error message when credentials are rejected", async () => {
-    onLogin.mockResolvedValue({ error: true });
+    onLogin.mockResolvedValue({ error: true, status: 401 });
     renderSignIn();
-    fill(/Username/i, "committee");
+    fill(/Electoral ID/i, "YJK883542");
     fill(/Password/i, "wrong");
     fireEvent.click(screen.getByRole("button", { name: /^Sign in$/i }));
     await waitFor(() =>
       expect(screen.getByText(/did not match/i)).toBeInTheDocument(),
     );
+  });
+
+  it("shows a server error message on a 500, not a credentials message", async () => {
+    onLogin.mockResolvedValue({ error: true, status: 500 });
+    renderSignIn();
+    fill(/Electoral ID/i, "YJK883542");
+    fill(/Password/i, "secret123");
+    fireEvent.click(screen.getByRole("button", { name: /^Sign in$/i }));
+    await waitFor(() =>
+      expect(screen.getByText(/went wrong on our end/i)).toBeInTheDocument(),
+    );
+    expect(screen.queryByText(/did not match/i)).not.toBeInTheDocument();
   });
 });

@@ -106,24 +106,36 @@ describe("SignUp screen", () => {
   it("registers and navigates to sign in on success", async () => {
     mockOnRegister.mockResolvedValue({ success: true });
     const navigation = nav();
-    const { getByText, UNSAFE_getAllByType } = render(
+    const { getByText, UNSAFE_getAllByType, UNSAFE_getByType } = render(
       <SignUp navigation={navigation} />,
     );
-    const { TextInput } = require("react-native");
+    const { TextInput, Alert } = require("react-native");
+    const { Picker } = require("@react-native-picker/picker");
+    const alertSpy = jest
+      .spyOn(Alert, "alert")
+      .mockImplementation((_title: any, _msg: any, buttons: any) => {
+        buttons?.[0]?.onPress?.();
+      });
+
     const inputs = UNSAFE_getAllByType(TextInput);
-    ["EL-1", "Ada", "ada@x.com", "12 St", "Luanda", "secret"].forEach((v, i) =>
+    ["Ada", "ada@x.com", "12 St", "secret"].forEach((v, i) =>
       fireEvent.changeText(inputs[i], v),
     );
+    fireEvent(UNSAFE_getByType(Picker), "valueChange", "California");
     fireEvent.press(getByText("Create account"));
 
     await waitFor(() =>
       expect(mockOnRegister).toHaveBeenCalledWith(
-        expect.objectContaining({ electoralId: "EL-1", province: "Luanda" }),
+        expect.objectContaining({
+          electoralId: expect.stringMatching(/^[A-Z]{3}\d{6}$/),
+          province: "California",
+        }),
       ),
     );
     await waitFor(() =>
       expect(navigation.navigate).toHaveBeenCalledWith("SignIn"),
     );
+    alertSpy.mockRestore();
   });
 });
 

@@ -330,12 +330,22 @@ Located in `blockchain/tests/`:
 
 ### Environment Setup
 
+The `backend` package imports TypeScript sources directly from the sibling
+`blockchain` package, so both are managed as one npm workspace rooted at
+`code/`. Install from `code/` so dependencies for both packages (including
+`crypto-js`, used by `blockchain/src/core/blockchain.ts`) get installed:
+
 ```bash
-cd code/backend
+cd code
+npm install
+cd backend
 cp .env.example .env
 # Edit .env with your secrets and configuration
-npm install
 ```
+
+(Running `npm install` only inside `code/backend` will skip the
+`blockchain` package's own dependencies and cause `Cannot find module
+'crypto-js/sha256'` when starting the backend.)
 
 ### Running the Backend
 

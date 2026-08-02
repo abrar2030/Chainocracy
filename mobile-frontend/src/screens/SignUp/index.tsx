@@ -1,5 +1,7 @@
+import { Picker } from "@react-native-picker/picker";
 import { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -11,11 +13,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Logo from "../../components/brand/Logo";
 import { Button, TextField } from "../../components/ui/Primitives";
+import { US_STATES } from "../../constants/usStates";
 import { useAuth } from "../../context/AuthContext";
 import { colors, radii, space } from "../../theme/designTokens";
+import { generateElectoralId } from "../../utils/electoralId";
 
 interface Form {
-  electoralId: string;
   name: string;
   email: string;
   address: string;
@@ -24,7 +27,6 @@ interface Form {
 }
 
 const empty: Form = {
-  electoralId: "",
   name: "",
   email: "",
   address: "",
@@ -50,9 +52,14 @@ export function SignUp({ navigation }: any) {
     }
     setLoading(true);
     try {
-      const result = await onRegister?.(form);
+      const electoralId = generateElectoralId();
+      const result = await onRegister?.({ ...form, electoralId });
       if (result?.success) {
-        navigation.navigate("SignIn");
+        Alert.alert(
+          "Success",
+          `Registration successful! Your Electoral ID is ${electoralId}. Save it, you'll need it to sign in.`,
+          [{ text: "OK", onPress: () => navigation.navigate("SignIn") }],
+        );
       } else {
         setError(result?.message || "Registration failed. Try again.");
       }
@@ -76,11 +83,6 @@ export function SignUp({ navigation }: any) {
 
           <View style={styles.form}>
             <TextField
-              label="Electoral ID"
-              value={form.electoralId}
-              onChangeText={set("electoralId")}
-            />
-            <TextField
               label="Full name"
               value={form.name}
               onChangeText={set("name")}
@@ -96,11 +98,20 @@ export function SignUp({ navigation }: any) {
               value={form.address}
               onChangeText={set("address")}
             />
-            <TextField
-              label="Province"
-              value={form.province}
-              onChangeText={set("province")}
-            />
+            <View style={styles.fieldWrap}>
+              <Text style={styles.fieldLabel}>State</Text>
+              <View style={styles.pickerBorder}>
+                <Picker
+                  selectedValue={form.province}
+                  onValueChange={(v) => set("province")(v)}
+                >
+                  <Picker.Item label="Select your state" value="" />
+                  {US_STATES.map((state) => (
+                    <Picker.Item key={state} label={state} value={state} />
+                  ))}
+                </Picker>
+              </View>
+            </View>
             <TextField
               label="Password"
               value={form.password}
@@ -128,6 +139,19 @@ export function SignUp({ navigation }: any) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.paper },
   scroll: { padding: space.lg, paddingBottom: space.xxl },
+  fieldWrap: { marginBottom: space.md },
+  fieldLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: colors.ink,
+    marginBottom: 6,
+  },
+  pickerBorder: {
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: radii.md,
+    overflow: "hidden",
+  },
   title: {
     fontSize: 28,
     fontWeight: "700",

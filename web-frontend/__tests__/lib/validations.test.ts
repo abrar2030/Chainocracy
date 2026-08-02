@@ -151,11 +151,11 @@ describe("candidateSchema", () => {
 
 describe("citizenSchema", () => {
   const validCitizen = {
-    name: "Maria Silva",
+    name: "Maria Garcia",
     electoralId: "ELEC12345",
     email: "maria@example.com",
-    address: "123 Main Street, Luanda",
-    province: "Luanda",
+    address: "123 Main Street, Los Angeles",
+    province: "California",
   };
 
   it("validates correct citizen data", () => {

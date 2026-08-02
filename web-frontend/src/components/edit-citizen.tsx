@@ -28,28 +28,10 @@ import {
 } from "@/components/ui/select";
 // import { useToast } from "@/components/toast/use-toast";
 import type { Citizen } from "@/data_types";
+import { US_STATES } from "@/constants/usStates";
 import { api } from "../../services/api";
 
-const provinces = [
-  "Bengo",
-  "Benguela",
-  "Bié",
-  "Cabinda",
-  "Cuando Cubango",
-  "Cuanza Norte",
-  "Cuanza Sul",
-  "Cunene",
-  "Huambo",
-  "Huíla",
-  "Luanda",
-  "Lunda Norte",
-  "Lunda Sul",
-  "Malanje",
-  "Moxico",
-  "Namibe",
-  "Uíge",
-  "Zaire",
-];
+const provinces = US_STATES;
 
 const formSchema = z.object({
   name: z.string(),

@@ -1,27 +1,42 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthLayout from "@/components/layout/AuthLayout";
 import { useAuth } from "@/context/AuthContext";
 
 export default function SignIn() {
   const { onLogin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const registeredState = location.state as
+    { registered?: boolean; electoralId?: string } | undefined;
 
-  const [username, setUsername] = useState("");
+  const [electoralId, setElectoralId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const submit = async () => {
     setError(null);
-    if (!username || !password) {
-      setError("Enter your username and password to continue.");
+    if (!electoralId || !password) {
+      setError("Enter your Electoral ID and password to continue.");
       return;
     }
     setLoading(true);
     try {
-      const result: any = await onLogin(username, password);
-      if (result?.error || !result?.data?.accessToken) {
+      const result: any = await onLogin(electoralId, password);
+      if (result?.error) {
+        if (result.status === 401) {
+          setError(
+            "Those credentials did not match. Check them and try again.",
+          );
+        } else if (result.status) {
+          setError("Something went wrong on our end. Try again in a moment.");
+        } else {
+          setError("We could not reach the server. Check your connection.");
+        }
+        return;
+      }
+      if (!result?.data?.accessToken) {
         setError("Those credentials did not match. Check them and try again.");
         return;
       }
@@ -35,11 +50,11 @@ export default function SignIn() {
 
   return (
     <AuthLayout
-      title="Committee sign in"
-      subtitle="Access the election control center."
+      title="Sign in"
+      subtitle="Access your QuantumBallot account."
       footer={
         <>
-          New committee member?{" "}
+          New here?{" "}
           <Link
             to="/signup"
             className="font-semibold text-qb-primary hover:underline"
@@ -50,10 +65,25 @@ export default function SignIn() {
       }
     >
       <div className="space-y-4">
+        {registeredState?.registered && (
+          <p className="rounded-lg border border-qb-primary/30 bg-qb-primary/5 px-3 py-2 text-sm text-qb-ink">
+            Account created.
+            {registeredState.electoralId && (
+              <>
+                {" "}
+                Your Electoral ID is{" "}
+                <span className="font-semibold">
+                  {registeredState.electoralId}
+                </span>
+                . Save it, you'll need it later.
+              </>
+            )}
+          </p>
+        )}
         <Field
-          label="Username"
-          value={username}
-          onChange={setUsername}
+          label="Electoral ID"
+          value={electoralId}
+          onChange={setElectoralId}
           autoComplete="username"
           onEnter={submit}
         />

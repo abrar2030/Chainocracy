@@ -16,29 +16,11 @@ import {
   TOKEN_ROLE,
   TOKEN_USERNAME,
 } from "@/global/globalVariables";
+import { US_STATES } from "@/constants/usStates";
 import { loadImages } from "@/services/firebase";
 import { deleteItemAsync, getItemAsync, setItemAsync } from "./SecureStore";
 
-const provinces = [
-  "Bengo",
-  "Benguela",
-  "Bié",
-  "Cabinda",
-  "Cuando Cubango",
-  "Cuanza Norte",
-  "Cuanza Sul",
-  "Cunene",
-  "Huambo",
-  "Huíla",
-  "Luanda",
-  "Lunda Norte",
-  "Lunda Sul",
-  "Malanje",
-  "Moxico",
-  "Namibe",
-  "Uíge",
-  "Zaire",
-];
+const provinces = US_STATES;
 
 export const API_URL =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000";
@@ -128,30 +110,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const URL_AUTH = `${API_URL}/api/committee`;
 
-  const login = useCallback(async (username: string, password: string) => {
+  const login = useCallback(async (electoralId: string, password: string) => {
     try {
       axios.defaults.withCredentials = true;
       const result = await axios.post(
-        `${URL_AUTH}/auth-web`,
-        { username, password },
+        `${URL_AUTH}/auth-mobile`,
+        { electoralId, password },
         { withCredentials: true },
       );
       setAuthState({
         token: result.data.accessToken,
         authenticated: true,
-        username: result.data.username,
-        name: result.data.name,
-        role: result.data.role,
+        username: electoralId,
+        name: result.data.email ?? "",
+        role: "",
       });
       axios.defaults.headers.common.Authorization = `Bearer ${result.data.accessToken}`;
       await setItemAsync(TOKEN_KEY, result.data.accessToken);
-      await setItemAsync(REFRESH_TOKEN_KEY, result.data.refreshToken);
-      await setItemAsync(TOKEN_USERNAME, result.data.username);
-      await setItemAsync(TOKEN_NAME, result.data.name);
-      await setItemAsync(TOKEN_ROLE, result.data.role ?? "");
+      await setItemAsync(TOKEN_USERNAME, electoralId);
+      await setItemAsync(TOKEN_NAME, result.data.email ?? "");
       return result;
-    } catch (e) {
-      return { error: true, msg: e };
+    } catch (e: any) {
+      return { error: true, status: e?.response?.status, msg: e };
     }
   }, []);
 
@@ -173,20 +153,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const isLoggedIn = useCallback(async () => {
     try {
-      const refreshToken = await getItemAsync(REFRESH_TOKEN_KEY);
-      if (!refreshToken) return { error: true };
+      const token = await getItemAsync(TOKEN_KEY);
+      if (!token) return { error: true };
       axios.defaults.withCredentials = true;
-      axios.defaults.headers.common.Authorization = `Bearer ${refreshToken}`;
-      const response = await axios.get(`${URL_AUTH}/refresh-token-web`, {
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+      const response = await axios.get(`${URL_AUTH}/refresh-token`, {
         withCredentials: true,
       });
-      if (response.status === 201) {
-        const token = response.data.accessToken;
-        const newRefreshToken = response.data.refreshToken;
-        setAuthState((prev) => ({ ...prev, token, authenticated: true }));
-        axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-        await setItemAsync(TOKEN_KEY, token);
-        await setItemAsync(REFRESH_TOKEN_KEY, newRefreshToken);
+      if (response.status === 200) {
+        const newToken = response.data.accessToken;
+        setAuthState((prev) => ({
+          ...prev,
+          token: newToken,
+          authenticated: true,
+        }));
+        axios.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+        await setItemAsync(TOKEN_KEY, newToken);
         return response;
       }
       await logout();

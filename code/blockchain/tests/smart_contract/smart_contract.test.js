@@ -64,7 +64,7 @@ describe("SmartContract", () => {
     ];
 
     mockCitizens = [
-      { electoralId: "decrypted_electoral_id", province: "Luanda" },
+      { electoralId: "decrypted_electoral_id", province: "California" },
     ];
 
     leveldb.readAnnouncement.mockResolvedValue(mockAnnouncement);
@@ -87,7 +87,7 @@ describe("SmartContract", () => {
   describe("initialization", () => {
     test("should expose electionState and provinces", () => {
       expect(smartContract.electionState).toBeDefined();
-      expect(smartContract.provinces).toHaveLength(18);
+      expect(smartContract.provinces).toHaveLength(50);
     });
 
     test("should load announcement via getAnnouncement()", async () => {

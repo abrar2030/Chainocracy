@@ -8,7 +8,6 @@ const navigate = vi.fn();
 vi.mock("axios");
 vi.mock("@/context/AuthContext", () => ({
   API_URL: "http://localhost:3010",
-  useAuth: () => ({ provinces: ["Luanda", "Bengo", "Huambo"] }),
 }));
 vi.mock("react-router-dom", async () => {
   const actual =
@@ -36,13 +35,16 @@ describe("SignUp page", () => {
     (axios.post as unknown as ReturnType<typeof vi.fn>)?.mockReset?.();
   });
 
-  it("renders the registration form with province options", () => {
+  it("renders the registration form with state options, and no Electoral ID field", () => {
     renderSignUp();
     expect(
       screen.getByRole("heading", { name: /Create your account/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Select your province/i)).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "Luanda" })).toBeInTheDocument();
+    expect(screen.getByText(/Select your state/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "California" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByLabelText(/Electoral ID/i)).not.toBeInTheDocument();
   });
 
   it("blocks submission until every field is filled", () => {
@@ -52,16 +54,15 @@ describe("SignUp page", () => {
     expect(axios.post).not.toHaveBeenCalled();
   });
 
-  it("registers and routes to sign in on success", async () => {
+  it("registers with an auto-generated electoral ID and routes to sign in on success", async () => {
     (axios.post as any).mockResolvedValue({ status: 201 });
     renderSignUp();
 
-    fill(/Electoral ID/i, "EL-99");
     fill(/Full name/i, "Ada Voter");
     fill(/Email/i, "ada@example.com");
     fill(/Address/i, "12 Chain St");
-    fireEvent.change(screen.getByLabelText(/Province/i), {
-      target: { value: "Luanda" },
+    fireEvent.change(screen.getByLabelText(/State/i), {
+      target: { value: "California" },
     });
     fill(/Password/i, "secret123");
 
@@ -71,16 +72,19 @@ describe("SignUp page", () => {
       expect(axios.post).toHaveBeenCalledWith(
         "http://localhost:3010/api/committee/register-voter",
         expect.objectContaining({
-          electoralId: "EL-99",
+          electoralId: expect.stringMatching(/^[A-Z]{3}\d{6}$/),
           name: "Ada Voter",
-          province: "Luanda",
+          province: "California",
         }),
       ),
     );
     await waitFor(() =>
-      expect(navigate).toHaveBeenCalledWith("/signin", {
-        state: { registered: true },
-      }),
+      expect(navigate).toHaveBeenCalledWith(
+        "/signin",
+        expect.objectContaining({
+          state: expect.objectContaining({ registered: true }),
+        }),
+      ),
     );
   });
 });

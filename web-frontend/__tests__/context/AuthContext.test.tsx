@@ -90,7 +90,7 @@ describe("AuthContext", () => {
     });
   });
 
-  it("provides 18 provinces (Angola)", async () => {
+  it("provides 50 states (US)", async () => {
     const ProvincesCount = () => {
       const { provinces } = useAuth();
       return <span data-testid="count">{provinces?.length}</span>;
@@ -101,7 +101,7 @@ describe("AuthContext", () => {
       </AuthProvider>,
     );
     await waitFor(() => {
-      expect(screen.getByTestId("count").textContent).toBe("18");
+      expect(screen.getByTestId("count").textContent).toBe("50");
     });
   });
 

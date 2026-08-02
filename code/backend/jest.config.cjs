@@ -1,6 +1,6 @@
 /** @type {import('jest').Config} */
 module.exports = {
-  // FIX 4: rootDir must be code/ so blockchain/tests/** is reachable
+  // rootDir is code/ so both backend/tests/** and blockchain/tests/** are reachable
   rootDir: "..",
   testEnvironment: "node",
   transform: {

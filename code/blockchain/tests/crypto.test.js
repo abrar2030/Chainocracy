@@ -209,7 +209,7 @@ describe("CryptoBlockchain", () => {
     });
 
     test("should round-trip unicode / multi-byte characters", () => {
-      const data = "Angola eleicao";
+      const data = "American election café ☕";
       expect(
         cryptoBlockchain.decryptData(cryptoBlockchain.encryptData(data)),
       ).toBe(data);

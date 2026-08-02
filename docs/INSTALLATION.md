@@ -139,10 +139,14 @@ cd QuantumBallot
 
 ## Backend Setup
 
-### Step 1: Navigate to Backend Directory
+### Step 1: Navigate to the Code Workspace
+
+The backend imports TypeScript sources directly from the sibling `blockchain`
+package, so the two are managed as a single npm workspace rooted at `code/`.
+Install once from there rather than from `backend/` alone:
 
 ```bash
-cd QuantumBallot/backend
+cd QuantumBallot/code
 ```
 
 ### Step 2: Install Dependencies
@@ -151,14 +155,24 @@ cd QuantumBallot/backend
 npm install
 ```
 
-This installs all required packages including:
+Running `npm install` from `code/` installs and hoists dependencies for
+**both** the `backend` and `blockchain` workspace packages into a single
+`code/node_modules`, including:
 
 - Express (web framework)
 - TypeScript (type safety)
 - LevelDB (blockchain storage)
 - Socket.IO (real-time communication)
 - bcrypt, jsonwebtoken (authentication)
-- crypto-js (encryption)
+- crypto-js (encryption, used by both `backend` and `blockchain`)
+
+Running `npm install` only inside `code/backend` will leave the `blockchain`
+package's own dependencies (e.g. `crypto-js`) uninstalled, which causes
+`Cannot find module 'crypto-js/sha256'` when starting the backend.
+
+You can still run backend scripts from `code/backend` as before (e.g.
+`cd code/backend && npm start`), or use the workspace shortcuts from
+`code/`: `npm start`, `npm run dev`, `npm run build`.
 
 ### Step 3: Configure Environment
 

@@ -13,66 +13,14 @@ import {
   View,
 } from "react-native";
 import { TextInput } from "react-native-paper";
+import { US_STATES } from "../../constants/usStates";
 import { useAuth } from "../../context/AuthContext";
-
-const US_STATES = [
-  "Alabama",
-  "Alaska",
-  "Arizona",
-  "Arkansas",
-  "California",
-  "Colorado",
-  "Connecticut",
-  "Delaware",
-  "Florida",
-  "Georgia",
-  "Hawaii",
-  "Idaho",
-  "Illinois",
-  "Indiana",
-  "Iowa",
-  "Kansas",
-  "Kentucky",
-  "Louisiana",
-  "Maine",
-  "Maryland",
-  "Massachusetts",
-  "Michigan",
-  "Minnesota",
-  "Mississippi",
-  "Missouri",
-  "Montana",
-  "Nebraska",
-  "Nevada",
-  "New Hampshire",
-  "New Jersey",
-  "New Mexico",
-  "New York",
-  "North Carolina",
-  "North Dakota",
-  "Ohio",
-  "Oklahoma",
-  "Oregon",
-  "Pennsylvania",
-  "Rhode Island",
-  "South Carolina",
-  "South Dakota",
-  "Tennessee",
-  "Texas",
-  "Utah",
-  "Vermont",
-  "Virginia",
-  "Washington",
-  "West Virginia",
-  "Wisconsin",
-  "Wyoming",
-];
+import { generateElectoralId } from "../../utils/electoralId";
 
 export function Registration() {
   const navigation = useNavigation<any>();
   const { onRegister } = useAuth();
 
-  const [electoralId, setElectoralId] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -85,7 +33,6 @@ export function Registration() {
 
   const validateForm = (): boolean => {
     if (
-      !electoralId ||
       !name ||
       !email ||
       !password ||
@@ -94,10 +41,6 @@ export function Registration() {
       !province
     ) {
       Alert.alert("Error", "Please fill in all fields");
-      return false;
-    }
-    if (electoralId.length < 5) {
-      Alert.alert("Error", "Electoral ID must be at least 5 characters");
       return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -121,8 +64,9 @@ export function Registration() {
 
     setIsLoading(true);
     try {
+      const electoralId = generateElectoralId();
       const result = await onRegister?.({
-        electoralId: electoralId.trim(),
+        electoralId,
         name: name.trim(),
         email: email.trim().toLowerCase(),
         password,
@@ -133,8 +77,7 @@ export function Registration() {
       if (result?.success) {
         Alert.alert(
           "Success",
-          result.message ||
-            "Registration successful! Please check your email for further instructions.",
+          `Registration successful! Your Electoral ID is ${electoralId}. Save it, you'll need it to sign in.`,
           [{ text: "OK", onPress: () => navigation.navigate("Login") }],
         );
       } else {
@@ -175,18 +118,6 @@ export function Registration() {
         <Text style={styles.subtitle}>Join QuantumBallot Voting System</Text>
 
         <View style={styles.formContainer}>
-          <TextInput
-            label="Electoral ID"
-            value={electoralId}
-            onChangeText={setElectoralId}
-            mode="outlined"
-            style={styles.input}
-            autoCapitalize="none"
-            autoCorrect={false}
-            disabled={isLoading}
-            left={<TextInput.Icon icon="card-account-details-outline" />}
-          />
-
           <TextInput
             label="Full Name"
             value={name}
@@ -258,7 +189,7 @@ export function Registration() {
           />
 
           <View style={styles.pickerContainer}>
-            <Text style={styles.pickerLabel}>State / Province</Text>
+            <Text style={styles.pickerLabel}>State</Text>
             <Picker
               selectedValue={province}
               onValueChange={(itemValue) => setProvince(itemValue)}

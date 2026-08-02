@@ -2,28 +2,27 @@ import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "@/components/layout/AuthLayout";
-import { API_URL, useAuth } from "@/context/AuthContext";
+import { API_URL } from "@/context/AuthContext";
+import { US_STATES } from "@/constants/usStates";
+import { generateElectoralId } from "@/utils/electoralId";
 
 interface Form {
-  electoralId: string;
   name: string;
   email: string;
   address: string;
-  province: string;
+  state: string;
   password: string;
 }
 
 const empty: Form = {
-  electoralId: "",
   name: "",
   email: "",
   address: "",
-  province: "",
+  state: "",
   password: "",
 };
 
 export default function SignUp() {
-  const { provinces } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState<Form>(empty);
@@ -42,12 +41,17 @@ export default function SignUp() {
     }
     setLoading(true);
     try {
-      const res = await axios.post(
-        `${API_URL}/api/committee/register-voter`,
-        form,
-      );
+      const electoralId = generateElectoralId();
+      const res = await axios.post(`${API_URL}/api/committee/register-voter`, {
+        electoralId,
+        name: form.name,
+        email: form.email,
+        address: form.address,
+        province: form.state,
+        password: form.password,
+      });
       if (res.status === 201) {
-        navigate("/signin", { state: { registered: true } });
+        navigate("/signin", { state: { registered: true, electoralId } });
         return;
       }
       setError("We could not complete your registration. Try again.");
@@ -80,36 +84,31 @@ export default function SignUp() {
     >
       <div className="space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field
-            label="Electoral ID"
-            value={form.electoralId}
-            onChange={set("electoralId")}
-          />
           <Field label="Full name" value={form.name} onChange={set("name")} />
+          <Field
+            label="Email"
+            type="email"
+            value={form.email}
+            onChange={set("email")}
+            autoComplete="email"
+          />
         </div>
 
-        <Field
-          label="Email"
-          type="email"
-          value={form.email}
-          onChange={set("email")}
-          autoComplete="email"
-        />
         <Field label="Address" value={form.address} onChange={set("address")} />
 
         <label className="block">
           <span className="mb-1.5 block text-sm font-medium text-qb-ink">
-            Province
+            State
           </span>
           <select
-            value={form.province}
-            onChange={(e) => set("province")(e.target.value)}
+            value={form.state}
+            onChange={(e) => set("state")(e.target.value)}
             className="w-full rounded-xl border border-qb-line bg-white px-4 py-2.5 text-sm text-qb-ink outline-none transition-colors focus:border-qb-primary focus:ring-2 focus:ring-qb-primary/20"
           >
-            <option value="">Select your province</option>
-            {provinces?.map((p) => (
-              <option key={p} value={p}>
-                {p}
+            <option value="">Select your state</option>
+            {US_STATES.map((s) => (
+              <option key={s} value={s}>
+                {s}
               </option>
             ))}
           </select>

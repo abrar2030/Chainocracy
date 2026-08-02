@@ -236,7 +236,7 @@ describe("Committee", () => {
         electoralId: "test-id",
         address: "Addr",
         email: "e@e.com",
-        province: "Luanda",
+        province: "California",
         password: "hashed-password",
       });
       const result = await committee.authMobile("test-id", "password");
@@ -248,7 +248,7 @@ describe("Committee", () => {
         electoralId: "test-id",
         address: "Addr",
         email: "e@e.com",
-        province: "Luanda",
+        province: "California",
       });
     });
 
@@ -385,7 +385,7 @@ describe("Committee", () => {
         name: "New Name",
         email: "new@example.com",
         address: "Addr",
-        province: "Luanda",
+        province: "California",
         password: "pass",
       };
       const result = await committee.addCitzen(data);
@@ -469,7 +469,7 @@ describe("Committee", () => {
         name: "Old",
         email: "old@x.com",
         address: "Old Addr",
-        province: "Luanda",
+        province: "California",
         status: "pending",
       };
       leveldb.readCitizens.mockResolvedValueOnce([existing]);
@@ -478,7 +478,7 @@ describe("Committee", () => {
         name: "New",
         email: "new@x.com",
         address: "New Addr",
-        province: "Benguela",
+        province: "Texas",
         status: "verified",
       });
       expect(result).toBe(true);

@@ -43,7 +43,7 @@ vi.mock("@/context/AuthContext", () => ({
     setMapData: vi.fn(),
     partiesData: [],
     setPartiesData: vi.fn(),
-    provinces: ["Luanda", "Bengo"],
+    provinces: ["California", "Texas"],
     topVotesPerProvinces: [],
     setTopVotesPerProvinces: vi.fn(),
     imageList: {},

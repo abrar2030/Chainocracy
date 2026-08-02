@@ -1,0 +1,18 @@
+{
+  "name": "quantumballot-code",
+  "version": "1.0.0",
+  "private": true,
+  "description": "QuantumBallot monorepo root (npm workspaces) linking the backend and blockchain packages so cross-package imports resolve correctly",
+  "workspaces": [
+    "backend",
+    "blockchain"
+  ],
+  "scripts": {
+    "start": "npm run start --workspace=backend",
+    "dev": "npm run dev --workspace=backend",
+    "build": "npm run build --workspace=backend",
+    "test": "npm run test --workspace=backend",
+    "typecheck:blockchain": "npm run typecheck --workspace=blockchain",
+    "start:network": "npm run start:network --workspace=backend"
+  }
+}
