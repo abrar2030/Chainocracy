@@ -221,6 +221,16 @@ describe("CryptoBlockchain", () => {
       expect(e1.CIPHER_TEXT).not.toBe(e2.CIPHER_TEXT);
     });
 
+    test("encrypting the same plaintext twice should use a fresh IV each time (no static-IV reuse)", () => {
+      const e1 = cryptoBlockchain.encryptData("same message");
+      const e2 = cryptoBlockchain.encryptData("same message");
+      expect(e1.IV).not.toBe(e2.IV);
+      expect(e1.CIPHER_TEXT).not.toBe(e2.CIPHER_TEXT);
+      // Both should still decrypt correctly with their own recorded IV.
+      expect(cryptoBlockchain.decryptData(e1)).toBe("same message");
+      expect(cryptoBlockchain.decryptData(e2)).toBe("same message");
+    });
+
     test("should throw 'Failed to encrypt data' when cipher creation throws", () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation();
       const mockError = new Error("Mock encryption error");

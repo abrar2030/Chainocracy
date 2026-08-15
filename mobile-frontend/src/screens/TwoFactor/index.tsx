@@ -19,7 +19,7 @@ import axios from "src/api/axios";
 import { useAuth } from "src/context/AuthContext";
 import { Config } from "../../constants/config";
 
-const TRANSACTION_URL = "/blockchain/make-transaction";
+const TRANSACTION_URL = "/blockchain/transaction";
 const VERIFY_OTP_URL = Config.ENDPOINTS.VERIFY_OTP;
 const TOKEN_KEY = Config.STORAGE_KEYS.JWT_TOKEN;
 
@@ -133,11 +133,7 @@ export function TwoFactor({ navigation, route }: TwoFactorProps) {
       const statusCode = response.status;
 
       if (statusCode === 200 || statusCode === 201) {
-        return (
-          response.data.details?.transactionHash ||
-          response.data.transactionHash ||
-          ""
-        );
+        return response.data.data?.transactionHash || "";
       }
 
       throw new Error("Failed to record vote on blockchain");

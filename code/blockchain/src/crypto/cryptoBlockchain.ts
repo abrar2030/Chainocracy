@@ -47,10 +47,6 @@ class CryptoBlockchain {
     return this.stringToBuffer(this.KEY || DEFAULT_KEY, 32);
   }
 
-  private getIVBuffer(): Buffer {
-    return this.stringToBuffer(this.IV || DEFAULT_IV, 16);
-  }
-
   public generateSecret(): { key: string; iv: string } {
     try {
       const SECRET_KEY = crypto.randomBytes(this.keyLength);
@@ -78,7 +74,13 @@ class CryptoBlockchain {
   public encryptData(data: string) {
     try {
       const keyBuf = this.getKeyBuffer();
-      const ivBuf = this.getIVBuffer();
+      // Use a fresh random IV for every encryption rather than the fixed,
+      // constructor-configured IV: reusing a static IV across calls with
+      // AES-CBC means identical plaintexts always produce identical
+      // ciphertexts, leaking patterns (e.g. which voters chose the same
+      // candidate). The IV is returned alongside the ciphertext and
+      // decryptData already takes it per-call, so this is a drop-in fix.
+      const ivBuf = crypto.randomBytes(16);
       const cipher = crypto.createCipheriv(this.algorithm, keyBuf, ivBuf);
       let encrypted = cipher.update(data);
       encrypted = Buffer.concat([encrypted, cipher.final()]);

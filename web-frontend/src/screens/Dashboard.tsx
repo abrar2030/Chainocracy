@@ -64,8 +64,7 @@ function Dashboard() {
       const response = await axios.get(
         `http://${GLOBAL_VARIABLES.LOCALHOST}/api/blockchain/get-results-computed`,
       );
-      const results = response.data;
-
+      const results = response.data.data;
       if (results?.candidatesResult) {
         let newDataCandidates = results.candidatesResult.map(
           (x: any, index: any) => {

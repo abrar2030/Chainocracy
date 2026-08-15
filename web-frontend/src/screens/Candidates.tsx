@@ -35,7 +35,7 @@ function Candidates() {
     axios
       .get(`http://${GLOBAL_VARIABLES.LOCALHOST}/api/blockchain/candidates`)
       .then((response) => {
-        const candidates = response.data.candidates;
+        const candidates = response.data.data.candidates;
         if (candidates) {
           const newData = candidates.map((element: any, index: number) => {
             const candidatePhotoName = element.name
@@ -107,11 +107,11 @@ function Candidates() {
 
   const onPressDeployBlockchain = () => {
     axios
-      .get(
+      .post(
         `http://${GLOBAL_VARIABLES.LOCALHOST}/api/blockchain/deploy-candidates`,
       )
       .then((response) => {
-        const candidates = response.data.candidates;
+        const candidates = response.data.data.candidates;
         if (candidates) {
           const newData = candidates.map((element: any, index: number) => {
             const candidatePhotoName = element.name

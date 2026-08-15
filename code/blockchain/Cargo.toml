@@ -1,0 +1,33 @@
+[package]
+name = "quantumballot-smart-contract"
+version = "1.0.0"
+edition = "2021"
+description = "Rust reference implementations of the QuantumBallot voting smart contract"
+publish = false
+
+[[bin]]
+name = "smart_contract"
+path = "src/smart_contract/smart_contract.rs"
+
+[[bin]]
+name = "voting_mechanisms"
+path = "src/smart_contract/voting_mechanisms.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+reqwest = { version = "0.11", features = ["json"] }
+log = "0.4"
+env_logger = "0.11"
+thiserror = "1"
+sha2 = "0.10"
+tokio = { version = "1", features = ["full"] }
+
+# Transitive pin: newer `url` releases pull in `idna` 1.x, which chains into
+# the ICU crate family (idna_adapter, indexmap 2.12+, litemap, zerovec, ...)
+# that requires the edition2024 Cargo feature - unavailable on the toolchain
+# this workspace targets (rustc/cargo 1.75). Pinning `url` keeps `idna` on
+# the pre-ICU 0.5 line, which avoids that whole chain.
+url = "=2.5.2"
+native-tls = "=0.2.13"
+openssl-sys = "=0.9.114"
+indexmap = "=2.11.4"

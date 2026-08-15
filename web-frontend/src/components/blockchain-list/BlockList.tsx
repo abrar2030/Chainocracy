@@ -122,7 +122,12 @@ export default function BlockList() {
 
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["block-list"],
-    queryFn: () => fetch(URI).then((res) => res.json()),
+    // Backend responses are wrapped as {success, message, data, timestamp};
+    // unwrap to the actual block list here.
+    queryFn: () =>
+      fetch(URI)
+        .then((res) => res.json())
+        .then((json) => json.data),
   });
 
   useEffect(() => {

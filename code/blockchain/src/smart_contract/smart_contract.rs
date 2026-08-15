@@ -1,14 +1,13 @@
 #![allow(warnings)]
 
-use std::fmt;
-use std::env;
-use std::fs;
-use std::collections::{HashMap, HashSet};
+use log::{error, info, warn};
 use serde::{Deserialize, Serialize};
-use reqwest::Error;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::collections::{HashMap, HashSet};
+use std::env;
+use std::fmt;
+use std::fs;
 use std::sync::{Arc, Mutex};
-use log::{info, warn, error};
+use std::time::{SystemTime, UNIX_EPOCH};
 use thiserror::Error;
 
 // Custom error types for better error handling
@@ -66,9 +65,9 @@ pub struct Candidate {
 pub struct Voter {
     pub identifier: String,
     pub choice_code: u64,
-    pub has_voted: bool,       // Explicit tracking of voting status
-    pub voting_power: f64,     // For quadratic voting
-    pub last_vote_time: u64,   // For rate limiting
+    pub has_voted: bool,     // Explicit tracking of voting status
+    pub voting_power: f64,   // For quadratic voting
+    pub last_vote_time: u64, // For rate limiting
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
@@ -90,13 +89,21 @@ pub struct Event {
 
 impl fmt::Display for Candidate {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {}, {}, {})", self.name, self.num_votes, self.code, self.description)
+        write!(
+            f,
+            "({}, {}, {}, {})",
+            self.name, self.num_votes, self.code, self.description
+        )
     }
 }
 
 impl fmt::Display for Voter {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {}, voted: {})", self.identifier, self.choice_code, self.has_voted)
+        write!(
+            f,
+            "({}, {}, voted: {})",
+            self.identifier, self.choice_code, self.has_voted
+        )
     }
 }
 
@@ -193,7 +200,7 @@ impl ElectionContract {
     pub fn emergency_stop(&self, caller: &str) -> ContractResult<()> {
         if !self.is_admin(caller) {
             return Err(ContractError::AccessDenied(
-                "Only admin can trigger emergency stop".to_string()
+                "Only admin can trigger emergency stop".to_string(),
             ));
         }
 
@@ -209,7 +216,7 @@ impl ElectionContract {
     pub fn resume_operations(&self, caller: &str) -> ContractResult<()> {
         if !self.is_admin(caller) {
             return Err(ContractError::AccessDenied(
-                "Only admin can resume operations".to_string()
+                "Only admin can resume operations".to_string(),
             ));
         }
 
@@ -226,7 +233,7 @@ impl ElectionContract {
         let config = self.config.lock().unwrap();
         if config.emergency_stop {
             return Err(ContractError::StateError(
-                "Contract is in emergency stop mode".to_string()
+                "Contract is in emergency stop mode".to_string(),
             ));
         }
         Ok(())
@@ -238,7 +245,7 @@ impl ElectionContract {
 
         if !self.is_admin(caller) {
             return Err(ContractError::AccessDenied(
-                "Only admin can announce elections".to_string()
+                "Only admin can announce elections".to_string(),
             ));
         }
 
@@ -256,7 +263,7 @@ impl ElectionContract {
 
         if !self.is_admin(caller) {
             return Err(ContractError::AccessDenied(
-                "Only admin can start elections".to_string()
+                "Only admin can start elections".to_string(),
             ));
         }
 
@@ -264,7 +271,7 @@ impl ElectionContract {
 
         if *state != ElectionState::Announced {
             return Err(ContractError::StateError(
-                "Election must be in Announced state to start".to_string()
+                "Election must be in Announced state to start".to_string(),
             ));
         }
 
@@ -281,7 +288,7 @@ impl ElectionContract {
 
         if !self.is_admin(caller) {
             return Err(ContractError::AccessDenied(
-                "Only admin can end elections".to_string()
+                "Only admin can end elections".to_string(),
             ));
         }
 
@@ -289,7 +296,7 @@ impl ElectionContract {
 
         if *state != ElectionState::Started && *state != ElectionState::Happening {
             return Err(ContractError::StateError(
-                "Election must be in Started or Happening state to end".to_string()
+                "Election must be in Started or Happening state to end".to_string(),
             ));
         }
 
@@ -301,26 +308,32 @@ impl ElectionContract {
     }
 
     // Add candidate with validation and access control
-    pub fn add_candidate(&self, caller: &str, name: &str, code: u64, description: &str) -> ContractResult<()> {
+    pub fn add_candidate(
+        &self,
+        caller: &str,
+        name: &str,
+        code: u64,
+        description: &str,
+    ) -> ContractResult<()> {
         self.check_emergency_stop()?;
 
         if !self.is_admin(caller) {
             return Err(ContractError::AccessDenied(
-                "Only admin can add candidates".to_string()
+                "Only admin can add candidates".to_string(),
             ));
         }
 
         let state = self.state.lock().unwrap();
         if *state != ElectionState::Announced {
             return Err(ContractError::StateError(
-                "Candidates can only be added in Announced state".to_string()
+                "Candidates can only be added in Announced state".to_string(),
             ));
         }
 
         // Input validation
         if name.trim().is_empty() {
             return Err(ContractError::InvalidInput(
-                "Candidate name cannot be empty".to_string()
+                "Candidate name cannot be empty".to_string(),
             ));
         }
 
@@ -328,9 +341,10 @@ impl ElectionContract {
 
         // Check for duplicate candidate code
         if candidates.contains_key(&code) {
-            return Err(ContractError::InvalidInput(
-                format!("Candidate with code {} already exists", code)
-            ));
+            return Err(ContractError::InvalidInput(format!(
+                "Candidate with code {} already exists",
+                code
+            )));
         }
 
         let timestamp = SystemTime::now()
@@ -352,33 +366,45 @@ impl ElectionContract {
         self.emit_event(
             "CandidateAdded",
             &format!("Candidate {} added with code {}", name, code),
-            caller
+            caller,
         );
 
         Ok(())
     }
 
     // Register voter with validation and Sybil resistance
-    pub fn register_voter(&self, caller: &str, voter_id: &str, reputation_score: u64) -> ContractResult<()> {
+    pub fn register_voter(
+        &self,
+        caller: &str,
+        voter_id: &str,
+        reputation_score: u64,
+    ) -> ContractResult<()> {
         self.check_emergency_stop()?;
 
         if !self.is_admin(caller) {
             return Err(ContractError::AccessDenied(
-                "Only admin can register voters".to_string()
+                "Only admin can register voters".to_string(),
             ));
         }
 
-        let state = self.state.lock().unwrap();
-        if *state != ElectionState::Announced && *state != ElectionState::Started {
-            return Err(ContractError::StateError(
-                "Voters can only be registered in Announced or Started state".to_string()
-            ));
-        }
+        // Read the state and release the lock immediately: it is re-acquired
+        // below to transition Started -> Happening, and holding this guard
+        // across that later `self.state.lock()` would deadlock (std::sync::
+        // Mutex is not reentrant).
+        let was_started = {
+            let state = self.state.lock().unwrap();
+            if *state != ElectionState::Announced && *state != ElectionState::Started {
+                return Err(ContractError::StateError(
+                    "Voters can only be registered in Announced or Started state".to_string(),
+                ));
+            }
+            *state == ElectionState::Started
+        };
 
         // Input validation
         if voter_id.trim().is_empty() {
             return Err(ContractError::InvalidInput(
-                "Voter ID cannot be empty".to_string()
+                "Voter ID cannot be empty".to_string(),
             ));
         }
 
@@ -386,18 +412,20 @@ impl ElectionContract {
 
         // Sybil resistance check
         if reputation_score < config.min_reputation_score {
-            return Err(ContractError::InvalidInput(
-                format!("Reputation score too low, minimum required: {}", config.min_reputation_score)
-            ));
+            return Err(ContractError::InvalidInput(format!(
+                "Reputation score too low, minimum required: {}",
+                config.min_reputation_score
+            )));
         }
 
         let mut voters = self.voters.lock().unwrap();
 
         // Check for duplicate voter
         if voters.contains_key(voter_id) {
-            return Err(ContractError::InvalidInput(
-                format!("Voter with ID {} already registered", voter_id)
-            ));
+            return Err(ContractError::InvalidInput(format!(
+                "Voter with ID {} already registered",
+                voter_id
+            )));
         }
 
         // Calculate voting power based on reputation (quadratic voting)
@@ -420,18 +448,21 @@ impl ElectionContract {
 
         self.emit_event(
             "VoterRegistered",
-            &format!("Voter {} registered with voting power {:.2}", voter_id, voting_power),
-            caller
+            &format!(
+                "Voter {} registered with voting power {:.2}",
+                voter_id, voting_power
+            ),
+            caller,
         );
 
-        if *state == ElectionState::Started {
+        if was_started {
             let mut state = self.state.lock().unwrap();
             *state = ElectionState::Happening;
 
             self.emit_event(
                 "ElectionStateChanged",
                 "Election state changed to Happening",
-                caller
+                caller,
             );
         }
 
@@ -442,26 +473,32 @@ impl ElectionContract {
     pub fn place_vote(&self, voter_id: &str, candidate_code: u64) -> ContractResult<()> {
         self.check_emergency_stop()?;
 
-        let state = self.state.lock().unwrap();
-        if *state != ElectionState::Started && *state != ElectionState::Happening {
-            return Err(ContractError::StateError(
-                "Voting is only allowed in Started or Happening state".to_string()
-            ));
+        {
+            let state = self.state.lock().unwrap();
+            if *state != ElectionState::Started && *state != ElectionState::Happening {
+                return Err(ContractError::StateError(
+                    "Voting is only allowed in Started or Happening state".to_string(),
+                ));
+            }
         }
 
         // Check if voter exists and hasn't voted
         let mut voters = self.voters.lock().unwrap();
         let voter = match voters.get_mut(voter_id) {
             Some(v) => v,
-            None => return Err(ContractError::InvalidInput(
-                format!("Voter with ID {} does not exist", voter_id)
-            )),
+            None => {
+                return Err(ContractError::InvalidInput(format!(
+                    "Voter with ID {} does not exist",
+                    voter_id
+                )))
+            }
         };
 
         if voter.has_voted {
-            return Err(ContractError::InvalidInput(
-                format!("Voter {} has already voted", voter_id)
-            ));
+            return Err(ContractError::InvalidInput(format!(
+                "Voter {} has already voted",
+                voter_id
+            )));
         }
 
         // Rate limiting check
@@ -473,34 +510,39 @@ impl ElectionContract {
         let config = self.config.lock().unwrap();
 
         if current_time - voter.last_vote_time < config.voting_period_seconds {
-            return Err(ContractError::OperationFailed(
-                format!("Rate limit exceeded, please try again later")
-            ));
+            return Err(ContractError::OperationFailed(format!(
+                "Rate limit exceeded, please try again later"
+            )));
         }
 
         // Check if candidate exists
         let mut candidates = self.candidates.lock().unwrap();
         let candidate = match candidates.get_mut(&candidate_code) {
             Some(c) => c,
-            None => return Err(ContractError::InvalidInput(
-                format!("Candidate with code {} does not exist", candidate_code)
-            )),
+            None => {
+                return Err(ContractError::InvalidInput(format!(
+                    "Candidate with code {} does not exist",
+                    candidate_code
+                )))
+            }
         };
 
         // Apply quadratic voting - votes are weighted by the square root of reputation
         let vote_weight = voter.voting_power.round() as u64;
         if vote_weight == 0 {
             return Err(ContractError::OperationFailed(
-                "Voting power too low to cast a vote".to_string()
+                "Voting power too low to cast a vote".to_string(),
             ));
         }
 
         // Update candidate vote count with overflow protection
         match candidate.num_votes.checked_add(vote_weight) {
             Some(new_count) => candidate.num_votes = new_count,
-            None => return Err(ContractError::OperationFailed(
-                "Vote count overflow".to_string()
-            )),
+            None => {
+                return Err(ContractError::OperationFailed(
+                    "Vote count overflow".to_string(),
+                ))
+            }
         }
 
         // Mark voter as having voted
@@ -514,8 +556,11 @@ impl ElectionContract {
 
         self.emit_event(
             "VoteCast",
-            &format!("Voter {} cast vote for candidate {} with weight {}", voter_id, candidate_code, vote_weight),
-            voter_id
+            &format!(
+                "Voter {} cast vote for candidate {} with weight {}",
+                voter_id, candidate_code, vote_weight
+            ),
+            voter_id,
         );
 
         Ok(())
@@ -526,7 +571,7 @@ impl ElectionContract {
         let state = self.state.lock().unwrap();
         if *state != ElectionState::Ended {
             return Err(ContractError::StateError(
-                "Winner can only be determined after election has ended".to_string()
+                "Winner can only be determined after election has ended".to_string(),
             ));
         }
 
@@ -575,10 +620,12 @@ impl ElectionContract {
     }
 
     // Load candidate data from external source with proper error handling
-    pub async fn load_candidate_data(&self, caller: &str) -> Result<(), Error> {
+    pub async fn load_candidate_data(&self, caller: &str) -> ContractResult<()> {
         if !self.is_admin(caller) {
             error!("Access denied: Only admin can load candidate data");
-            return Ok(());
+            return Err(ContractError::AccessDenied(
+                "Only admin can load candidate data".to_string(),
+            ));
         }
 
         let config = self.config.lock().unwrap();
@@ -586,18 +633,27 @@ impl ElectionContract {
 
         info!("Loading candidate data from {}", file_url);
 
-        let response = reqwest::get(&file_url).await?;
+        let response = reqwest::get(&file_url)
+            .await
+            .map_err(|e| ContractError::ExternalResourceError(e.to_string()))?;
 
         if !response.status().is_success() {
-            error!("Failed to fetch candidate data: {}", response.status());
-            return Ok(());
+            let status = response.status();
+            error!("Failed to fetch candidate data: {}", status);
+            return Err(ContractError::ExternalResourceError(format!(
+                "Failed to fetch candidate data: {}",
+                status
+            )));
         }
 
         let candidates: Vec<Candidate> = match response.json().await {
             Ok(data) => data,
             Err(e) => {
                 error!("Failed to parse candidate data: {}", e);
-                return Ok(());
+                return Err(ContractError::ExternalResourceError(format!(
+                    "Failed to parse candidate data: {}",
+                    e
+                )));
             }
         };
 
@@ -609,18 +665,23 @@ impl ElectionContract {
 
         self.emit_event(
             "CandidatesLoaded",
-            &format!("Loaded {} candidates from external source", candidates.len()),
-            caller
+            &format!(
+                "Loaded {} candidates from external source",
+                candidates.len()
+            ),
+            caller,
         );
 
         Ok(())
     }
 
     // Load voter data from external source with proper error handling
-    pub async fn load_voter_data(&self, caller: &str) -> Result<(), Error> {
+    pub async fn load_voter_data(&self, caller: &str) -> ContractResult<()> {
         if !self.is_admin(caller) {
             error!("Access denied: Only admin can load voter data");
-            return Ok(());
+            return Err(ContractError::AccessDenied(
+                "Only admin can load voter data".to_string(),
+            ));
         }
 
         let config = self.config.lock().unwrap();
@@ -628,18 +689,27 @@ impl ElectionContract {
 
         info!("Loading voter data from {}", file_url);
 
-        let response = reqwest::get(&file_url).await?;
+        let response = reqwest::get(&file_url)
+            .await
+            .map_err(|e| ContractError::ExternalResourceError(e.to_string()))?;
 
         if !response.status().is_success() {
-            error!("Failed to fetch voter data: {}", response.status());
-            return Ok(());
+            let status = response.status();
+            error!("Failed to fetch voter data: {}", status);
+            return Err(ContractError::ExternalResourceError(format!(
+                "Failed to fetch voter data: {}",
+                status
+            )));
         }
 
         let voters: Vec<Voter> = match response.json().await {
             Ok(data) => data,
             Err(e) => {
                 error!("Failed to parse voter data: {}", e);
-                return Ok(());
+                return Err(ContractError::ExternalResourceError(format!(
+                    "Failed to parse voter data: {}",
+                    e
+                )));
             }
         };
 
@@ -652,10 +722,79 @@ impl ElectionContract {
         self.emit_event(
             "VotersLoaded",
             &format!("Loaded {} voters from external source", voters.len()),
-            caller
+            caller,
         );
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::mpsc;
+    use std::thread;
+    use std::time::Duration;
+
+    #[test]
+    fn test_full_election_lifecycle() {
+        let contract = ElectionContract::new("admin_address".to_string());
+
+        assert!(contract.announce_election("admin_address").is_ok());
+        assert!(contract
+            .add_candidate("admin_address", "Candidate 1", 1, "Description")
+            .is_ok());
+        assert!(contract
+            .register_voter("admin_address", "voter1", 100)
+            .is_ok());
+        assert!(contract.start_election("admin_address").is_ok());
+        assert!(contract.place_vote("voter1", 1).is_ok());
+        assert!(contract.end_election("admin_address").is_ok());
+
+        let winner = contract.winning_candidate().unwrap();
+        assert!(winner.is_some());
+        assert_eq!(winner.unwrap().code, 1);
+    }
+
+    // Regression test for a self-deadlock: register_voter used to lock
+    // `self.state`, then re-lock the same (non-reentrant) std::sync::Mutex
+    // later in the same call whenever the election was already Started,
+    // hanging the calling thread forever. Run on a worker thread and join
+    // with a timeout so a regression fails the test instead of hanging the
+    // whole suite.
+    #[test]
+    fn test_register_voter_after_election_started_does_not_deadlock() {
+        let contract = ElectionContract::new("admin_address".to_string());
+        contract.announce_election("admin_address").unwrap();
+        contract
+            .add_candidate("admin_address", "Candidate 1", 1, "Description")
+            .unwrap();
+        contract.start_election("admin_address").unwrap();
+
+        let (tx, rx) = mpsc::channel();
+        thread::spawn(move || {
+            let result = contract.register_voter("admin_address", "voter1", 100);
+            let _ = tx.send(result.is_ok());
+        });
+
+        match rx.recv_timeout(Duration::from_secs(5)) {
+            Ok(ok) => assert!(ok, "register_voter should succeed when state is Started"),
+            Err(_) => panic!("register_voter deadlocked when election state was already Started"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_load_candidate_data_denies_non_admin() {
+        let contract = ElectionContract::new("admin_address".to_string());
+        let result = contract.load_candidate_data("not_admin").await;
+        assert!(matches!(result, Err(ContractError::AccessDenied(_))));
+    }
+
+    #[tokio::test]
+    async fn test_load_voter_data_denies_non_admin() {
+        let contract = ElectionContract::new("admin_address".to_string());
+        let result = contract.load_voter_data("not_admin").await;
+        assert!(matches!(result, Err(ContractError::AccessDenied(_))));
     }
 }
 
@@ -672,7 +811,12 @@ async fn main() {
     }
 
     // Add a candidate
-    match contract.add_candidate("admin_address", "Candidate 1", 1, "Description for Candidate 1") {
+    match contract.add_candidate(
+        "admin_address",
+        "Candidate 1",
+        1,
+        "Description for Candidate 1",
+    ) {
         Ok(_) => println!("Candidate added successfully"),
         Err(e) => println!("Error adding candidate: {}", e),
     }

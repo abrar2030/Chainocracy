@@ -39,7 +39,7 @@ const ElectionResults = () => {
       const response = await axios.get(
         `http://${GLOBAL_VARIABLES.LOCALHOST}/api/blockchain/get-results-computed`,
       );
-      const data = response.data;
+      const data = response.data.data;
       if (data?.candidatesResult) {
         const mapped: CandidateResults[] = data.candidatesResult.map(
           (x: any, index: number) => ({

@@ -48,7 +48,7 @@ export interface Candidate {
 export interface Results {
   startTime: number;
   endTime: number;
-  winner: Candidate;
+  winner: Candidate | null;
   candidatesResult: CandidateResult[];
   expectedTotalVotes: number;
   totalVotesReceived: number;

@@ -5,7 +5,6 @@ import type { Block } from "../../../../blockchain/src/core/data_types";
 
 const axios = require("axios");
 const express = require("express");
-const router = express.Router();
 const verifyJWTWeb = require("../../middleware/verifyJWTWeb");
 
 const LOCALHOST = "http://localhost:";
@@ -55,8 +54,26 @@ const asyncHandler =
 
 // ── Module factory ────────────────────────────────────────────────────────────
 
-module.exports = (blockchain: BlockChain, allNodes: string[]) => {
+module.exports = (
+  blockchain: BlockChain,
+  allNodes: string[] | (() => string[]),
+) => {
+  // Created fresh per call, not at module scope: since Node caches this
+  // module, a module-level router would be a process-wide singleton that
+  // accumulates duplicate handlers every time this factory is invoked more
+  // than once (multiple blockchain instances in one process, or a test
+  // harness). Mirrors the existing pattern in api/index.ts.
+  const router = express.Router();
   const NODE_ADDRESS = blockchain.nodeAddress || "?";
+
+  // `allNodes` may be a static array (single-node deployments, e.g.
+  // code/backend/src/index.ts) or a getter (P2P deployments, e.g.
+  // code/backend/src/network/network.ts, where the peer list changes as
+  // nodes join/leave). Always resolve it fresh so P2P callers see live
+  // membership instead of whatever the list looked like when this router
+  // was constructed.
+  const resolveNodes = (): string[] =>
+    typeof allNodes === "function" ? allNodes() : allNodes;
 
   // ── Middleware ──────────────────────────────────────────────────────────────
 
@@ -89,7 +106,7 @@ module.exports = (blockchain: BlockChain, allNodes: string[]) => {
   ): Promise<any[] | undefined> => {
     try {
       const responses = await Promise.all(
-        allNodes
+        resolveNodes()
           .filter((url) => url !== NODE_ADDRESS)
           .map((url) => axios.post(LOCALHOST + url + OFFSET + endpoint, data)),
       );
@@ -102,7 +119,7 @@ module.exports = (blockchain: BlockChain, allNodes: string[]) => {
 
   const runConsensus = async () => {
     try {
-      const peers = allNodes.filter((url) => url !== NODE_ADDRESS);
+      const peers = resolveNodes().filter((url) => url !== NODE_ADDRESS);
       if (peers.length === 0) return;
 
       const responses = await Promise.all(
@@ -201,6 +218,39 @@ module.exports = (blockchain: BlockChain, allNodes: string[]) => {
       if (!results)
         return errorResponse(res, 404, "No computed results available");
       return successResponse(res, 200, results);
+    }),
+  );
+
+  router.get(
+    "/voting-status",
+    asyncHandler(async (req: Request, res: Response) => {
+      const { electoralId } = req.query;
+      if (!electoralId || typeof electoralId !== "string")
+        return errorResponse(
+          res,
+          400,
+          "Missing required query param: electoralId",
+        );
+
+      const identifier =
+        await blockchain.getCitizenRelatedIdentifier(electoralId);
+      if (!identifier)
+        return errorResponse(res, 404, "Unknown electoral identifier");
+
+      const existing = [
+        ...blockchain.getTransactions(),
+        ...blockchain.getPendingTransactions(),
+      ].find((tx: any) => tx.identifier === identifier);
+
+      if (!existing) return successResponse(res, 200, { hasVoted: false });
+
+      return successResponse(res, 200, {
+        hasVoted: true,
+        transactionHash: existing.transactionHash,
+        voteTimestamp: existing.voteTime
+          ? new Date(existing.voteTime).toISOString()
+          : undefined,
+      });
     }),
   );
 

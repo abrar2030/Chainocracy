@@ -418,7 +418,7 @@ class SmartContract {
     const results: Results = {
       startTime,
       endTime,
-      winner: winner!,
+      winner,
       expectedTotalVotes: this.announcement.numOfVoters,
       totalVotesReceived: counter_votes,
       totalCandidates: this.announcement.numOfCandidates,

@@ -42,12 +42,13 @@ export async function checkHasVoted(
     const response = await axios.get(votingStatusUrl, {
       params: { electoralId },
     });
+    const body = response.data.data;
 
     return {
-      hasVoted: response.data.hasVoted || false,
-      voteTimestamp: response.data.voteTimestamp,
-      transactionHash: response.data.transactionHash,
-      message: response.data.message,
+      hasVoted: body.hasVoted || false,
+      voteTimestamp: body.voteTimestamp,
+      transactionHash: body.transactionHash,
+      message: body.message,
     };
   } catch (error: any) {
     if (Config.APP.SHOW_LOGS) {
@@ -75,18 +76,21 @@ export async function submitVote(
 ): Promise<VoteSubmissionResponse> {
   try {
     const baseUrl = Config.API_BASE_URL.replace(/:\d+$/, "");
-    const blockchainUrl = `${baseUrl}:${port}/api/blockchain/make-transaction`;
+    const blockchainUrl = `${baseUrl}:${port}/api/blockchain/transaction`;
 
     if (Config.APP.SHOW_LOGS) {
       console.log("Submitting vote to:", blockchainUrl);
     }
 
-    const response = await axios.post(blockchainUrl, voteData);
+    const response = await axios.post(blockchainUrl, {
+      identifier: voteData.electoralId,
+      choiceCode: voteData.candidateCode,
+    });
+    const body = response.data.data;
 
     return {
       success: true,
-      transactionHash:
-        response.data.transactionHash || response.data.details?.transactionHash,
+      transactionHash: body?.transactionHash,
       message: response.data.message || "Vote recorded successfully",
     };
   } catch (error: any) {

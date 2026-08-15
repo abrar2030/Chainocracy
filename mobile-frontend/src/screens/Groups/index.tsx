@@ -75,8 +75,11 @@ export function Groups() {
         params: { electoralId: authState?.electoralId },
       });
 
-      if (response.data && typeof response.data.hasVoted === "boolean") {
-        setHasVoted(response.data.hasVoted);
+      if (
+        response.data?.data &&
+        typeof response.data.data.hasVoted === "boolean"
+      ) {
+        setHasVoted(response.data.data.hasVoted);
       } else {
         setHasVoted(false);
       }
@@ -114,12 +117,11 @@ export function Groups() {
     try {
       const port = authState?.port || "3010";
       const baseUrl = Config.API_BASE_URL.replace(/:\d+$/, "");
-      const blockchainUrl = `${baseUrl}:${port}/api/blockchain/make-transaction`;
+      const blockchainUrl = `${baseUrl}:${port}/api/blockchain/transaction`;
 
       const voteData = {
-        candidateCode: selectedCandidate,
-        electoralId: authState?.electoralId,
-        timestamp: new Date().toISOString(),
+        identifier: authState?.electoralId,
+        choiceCode: selectedCandidate,
       };
 
       const response = await axios.post(blockchainUrl, voteData);
@@ -135,9 +137,7 @@ export function Groups() {
               onPress: () => {
                 navigation.navigate("Thank Vote", {
                   candidateCode: selectedCandidate,
-                  transactionHash:
-                    response.data.transactionHash ||
-                    response.data.details?.transactionHash,
+                  transactionHash: response.data?.data?.transactionHash,
                 });
               },
             },

@@ -55,7 +55,7 @@ function PublicAnnouncement() {
         `http://${GLOBAL_VARIABLES.LOCALHOST}/api/blockchain/get-results-computed`,
       )
       .then((response) => {
-        const res = response.data;
+        const res = response.data.data;
         if (res?.candidatesResult) {
           let newData = res.candidatesResult.map((x: any, index: any) => {
             const candidatePhotoName = x.candidate.name
@@ -104,7 +104,7 @@ function PublicAnnouncement() {
         withCredentials: true,
       })
       .then((response) => {
-        const res = response.data;
+        const res = response.data.data;
         if (res?.candidatesResult) {
           let newData = res.candidatesResult.map((x: any, index: any) => {
             const candidatePhotoName = x.candidate.name
@@ -171,7 +171,9 @@ function PublicAnnouncement() {
 
   const onClearResults = () => {
     axios
-      .get(`http://${GLOBAL_VARIABLES.LOCALHOST}/api/blockchain/clear-results`)
+      .delete(
+        `http://${GLOBAL_VARIABLES.LOCALHOST}/api/blockchain/clear-results`,
+      )
       .then((response) => {
         if (response.data !== undefined) {
           toast({

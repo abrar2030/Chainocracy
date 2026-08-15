@@ -13,6 +13,7 @@ jest.mock("../src/leveldb", () => ({
 }));
 
 jest.mock("../src/smart_contract/smart_contract", () => ({
+  __esModule: true,
   default: jest.fn().mockImplementation(() => ({
     update: jest.fn(),
     isValidElectionTime: jest.fn().mockReturnValue(true),

@@ -9,7 +9,12 @@ export default function TablePendingTransactions() {
 
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["pending"],
-    queryFn: () => fetch(URI).then((res) => res.json()),
+    // Backend responses are wrapped as {success, message, data, timestamp};
+    // unwrap to the actual transaction list here.
+    queryFn: () =>
+      fetch(URI)
+        .then((res) => res.json())
+        .then((json) => json.data),
   });
 
   useEffect(() => {

@@ -48,7 +48,12 @@ const initBlockchain = async () => {
     await blockchain.setNodeAddress(NODE_ADDRESS.toString());
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const redirectRoute = (text: string) => require(text)(blockchain, allNodes);
+    // Pass getAllNodes itself (not allNodes) so the router always resolves
+    // the current peer list -- allNodes is reassigned to a new array on
+    // every join/leave (see addNode below), and a plain array reference
+    // captured here would stay frozen at whatever it was at this instant.
+    const redirectRoute = (text: string) =>
+      require(text)(blockchain, getAllNodes);
     app.use("/api", redirectRoute("../api/index"));
     console.log("Blockchain initialised for P2P node", NODE_ADDRESS);
   } catch (err: unknown) {

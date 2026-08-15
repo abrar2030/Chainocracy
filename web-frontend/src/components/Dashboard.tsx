@@ -72,7 +72,7 @@ function Dashboard() {
           "/api/blockchain/get-results-computed",
       )
       .then((response) => {
-        const results = response.data;
+        const results = response.data.data;
 
         if (results?.candidatesResult) {
           let newDataCandidates = results.candidatesResult.map(

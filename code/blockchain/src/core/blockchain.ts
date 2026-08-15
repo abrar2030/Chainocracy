@@ -409,6 +409,13 @@ class BlockChain {
       !this.isValidVote(transaction.data)
     )
       return false;
+    // Verify the hash actually matches the transaction's data, not just that
+    // it is well-formed. Without this, tampered vote data paired with any
+    // syntactically valid 64-char hex string would pass validation.
+    const expectedHash = this.hashData(
+      `${transaction.data.identifier}${transaction.data.choiceCode}${transaction.data.state}`,
+    );
+    if (expectedHash !== transaction.transactionHash) return false;
     return true;
   }
 

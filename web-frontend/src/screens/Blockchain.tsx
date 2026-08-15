@@ -53,7 +53,7 @@ function Blockchain() {
 
     const requests = nodeAddress.map((url) => {
       const URI = `http://localhost:${url}/api/blockchain/mine`; // + endpoint
-      return axios.get(URI);
+      return axios.post(URI);
     });
 
     const CancelToken = axios.CancelToken;

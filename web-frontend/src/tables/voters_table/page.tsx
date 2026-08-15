@@ -32,7 +32,7 @@ function TableVoters({ toast }: { toast: (...params: any[]) => void }) {
     axios
       .get(`http://${GLOBAL_VARIABLES.LOCALHOST}/api/blockchain/voters`)
       .then((response) => {
-        const voters = response.data.voters;
+        const voters = response.data.data.voters;
         if (voters) {
           const newData = voters.map((element: any, index: number) => ({
             id: index + 1,
@@ -81,9 +81,9 @@ function TableVoters({ toast }: { toast: (...params: any[]) => void }) {
 
   const onPressDeployBlockchain = () => {
     axios
-      .get(`http://${GLOBAL_VARIABLES.LOCALHOST}/api/blockchain/deploy-voters`)
+      .post(`http://${GLOBAL_VARIABLES.LOCALHOST}/api/blockchain/deploy-voters`)
       .then((response) => {
-        const votersGenerated = response.data.voters;
+        const votersGenerated = response.data.data.voters;
         const newData = votersGenerated.map((element: any, index: number) => ({
           id: index + 1,
           identifier: removeExtraEquals(element.identifier),

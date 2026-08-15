@@ -95,7 +95,7 @@ export function LiveProjection() {
       const resultsUrl = `${baseUrl}:${port}/api/blockchain/get-results-computed`;
 
       const response = await axios.get(resultsUrl);
-      const results = response.data;
+      const results = response.data.data;
       if (results?.candidatesResult) {
         let newDataCandidates: CandidateResult[] = results.candidatesResult.map(
           (x: any, index: number) => {

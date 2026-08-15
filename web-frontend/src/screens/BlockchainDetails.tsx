@@ -29,7 +29,12 @@ function BlockchainDetails() {
 
   const { isLoading, error, data, refetch } = useQuery({
     queryKey: ["block-details", blockHash],
-    queryFn: () => fetch(URI).then((res) => res.json()),
+    // Backend responses are wrapped as {success, message, data, timestamp};
+    // unwrap to the actual block-detail object here.
+    queryFn: () =>
+      fetch(URI)
+        .then((res) => res.json())
+        .then((json) => json.data),
     enabled: !!blockHash,
   });
 
