@@ -1,25 +1,26 @@
 # QuantumBallot
 
-![CI/CD Status](https://img.shields.io/github/actions/workflow/status/quantsingularity/QuantumBallot/cicd.yml?branch=main&label=CI/CD&logo=github)
-[![Test Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)](https://github.com/quantsingularity/QuantumBallot/actions)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![CI/CD Status](https://img.shields.io/github/actions/workflow/status/abrar2030/QuantumBallot/cicd.yml?branch=main&label=CI%2FCD&logo=github)
 
-A full-stack Web and Mobile application for American elections using Blockchain Technology. The system presents a user-friendly interface accessible via both web browsers and mobile platforms.
+## Blockchain-Based Election Management Platform
+
+QuantumBallot is an election management platform: a Node.js/TypeScript backend running a genuine custom Proof-of-Work blockchain (LevelDB-backed, with real mining and a "smart contract" election-state machine), paired with a React web dashboard for committee members and a React Native (Expo) mobile app for voters, including real 2FA (speakeasy) and QR code verification.
 
 <div align="center">
-  <img src="docs/images/homepage.bmp" alt="QuantumBallot HomePage" width="80%">
+  <img src="docs/images/homepage.bmp" alt="QuantumBallot HomePage" width="100%">
 </div>
 
 ## Table of Contents
 
 - [Overview](#overview)
 - [Project Structure](#project-structure)
-- [Features](#features)
+- [Feature Status](#feature-status)
 - [Technology Stack](#technology-stack)
+- [Architecture](#architecture)
 - [Installation and Setup](#installation-and-setup)
-- [Usage](#usage)
+- [Running the Stack](#running-the-stack)
+- [API Surface](#api-surface)
 - [Testing](#testing)
-- [Security](#security)
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
@@ -27,235 +28,203 @@ A full-stack Web and Mobile application for American elections using Blockchain 
 
 ## Overview
 
-QuantumBallot is a comprehensive election management system that leverages blockchain technology to ensure secure, transparent, and tamper-proof elections in America. The system allows committee members to seamlessly access the application through their browsers, while voters have the convenience of utilizing their smartphones, whether running on iOS or Android.
+QuantumBallot demonstrates an election workflow across a real, runnable codebase. The blockchain itself is a genuine custom implementation, not a wrapper around an existing chain: real SHA-256-based Proof-of-Work mining, a LevelDB-backed ledger, and a smart-contract-style election state machine (created, started, ended). A separate, substantial Rust implementation of the same voting logic (over 2,200 lines across two binaries) exists as a tested reference implementation but isn't called by the running Node.js backend.
 
 ## Project Structure
 
-The project is organized into several main components:
-
 ```
 QuantumBallot/
-├── code/                   # Core backend logic, services, and shared utilities
-├── docs/                   # Project documentation
-├── infrastructure/         # DevOps, deployment, and infra-related code
-├── mobile-frontend/        # Mobile application
-├── web-frontend/           # Web dashboard
-├── scripts/                # Automation, setup, and utility scripts
-├── LICENSE                 # License information
-└── README.md               # Project overview and instructions
+├── code/
+│   ├── backend/                  # Node.js/TypeScript (Express) API
+│   │   ├── src/api/routes/       # blockchain, committee (also handles auth,
+│   │   │                         # 2FA, and voter registration)
+│   │   ├── src/committee/        # Committee logic, 2FA (speakeasy), QR (qrcode)
+│   │   ├── src/network/          # Socket.IO server and a separate axios-based
+│   │   │                         # peer-to-peer HTTP layer
+│   │   ├── src/email_center/     # Email notifications
+│   │   └── tests/                # Backend test suite
+│   └── blockchain/               # The blockchain implementation
+│       ├── src/core/             # BlockChain class: real SHA-256 Proof-of-Work
+│       │                         # mining, block validation
+│       ├── src/leveldb/          # LevelDB-backed persistence
+│       ├── src/smart_contract/   # smart_contract.ts (used by the backend) plus
+│       │                         # smart_contract.rs and voting_mechanisms.rs
+│       │                         # (a separate, tested Rust reference
+│       │                         # implementation, not called by the TS backend)
+│       └── tests/                # Blockchain test suite
+├── web-frontend/                 # React (TypeScript, Vite) dashboard
+├── mobile-frontend/              # React Native (Expo, TypeScript) app
+├── infrastructure/               # Docker, Kubernetes, Terraform, Ansible, monitoring
+├── scripts/                      # Setup, build, deploy, and dev-workflow scripts
+├── docs/                         # Documentation (this directory)
+└── README.md
 ```
 
-### Backend API
+## Feature Status
 
-The backend is built with Node.js and TypeScript, providing RESTful APIs for both web and mobile clients. It includes:
+### Application tier (wired and tested)
 
-- Blockchain implementation
-- Authentication and authorization
-- Election management
-- Vote processing and verification
-- Real-time updates via Socket.IO
+| Component                   | Details                                                                                                                                                                                               |
+| :-------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Custom blockchain**       | A real Proof-of-Work chain: SHA-256 mining with a configurable difficulty target, block validation, and LevelDB-backed persistence.                                                                   |
+| **Election smart contract** | A genuine state machine (`smart_contract.ts`) tracking election lifecycle (created, started, ended), genuinely used by the API to create, run, and close elections.                                   |
+| **Auth and 2FA**            | JWT-based sessions (separate verification middleware for web and mobile), plus real TOTP two-factor authentication (speakeasy) with QR code enrollment (`qrcode`).                                    |
+| **Real-time updates**       | A genuine Socket.IO server in `network.ts`, separate from the peer-to-peer layer, which uses plain HTTP (axios) between blockchain nodes rather than WebSockets.                                      |
+| **Committee API**           | Registration, login, logout (web and mobile variants), token refresh, and voter/candidate management, all under `/committee`. There is no separate `/auth` route; this is where authentication lives. |
+| **Email notifications**     | Templated email sending for committee workflows.                                                                                                                                                      |
+| **Web dashboard**           | React and TypeScript app (Vite, Tailwind CSS, Radix UI, Material UI, Recharts and MUI X-Charts, React Hook Form with Zod) for committee members to manage elections and view blockchain details.      |
+| **Mobile app**              | React Native (Expo, TypeScript) app for voters, with React Native Paper, Expo Camera and Barcode Scanner for QR verification, and Expo Secure Store for credential storage.                           |
 
-### Web Frontend
+### Reference implementation (tested, not wired to the running application)
 
-A React-based web application with TypeScript and Tailwind CSS, designed for election committee members to:
-
-- Manage elections
-- Monitor voting progress
-- View election results
-- Manage candidates
-- Verify voter identities
-- Access blockchain details for transparency
-
-### Mobile Frontend
-
-A React Native application for voters that provides:
-
-- Secure authentication
-- Candidate information
-- Voting interface
-- QR code scanning for verification
-- Real-time election updates
-- Vote confirmation
-
-## Features
-
-### Election Management
-
-- Create and configure elections
-- Set election parameters (start/end dates, eligible voters)
-- Add and manage candidates
-- Monitor election progress in real-time
-
-### Voter Experience
-
-- Secure voter registration and authentication
-- View candidate information
-- Cast votes securely
-- Verify vote submission
-- View election results
-
-### Blockchain Integration
-
-- Immutable record of all votes
-- Transparent verification process
-- Prevention of double-voting
-- Cryptographic security
-- Decentralized validation
-
-### Security Features
-
-- Two-factor authentication
-- Encryption of sensitive data
-- QR code verification
-- Audit trails
-- Secure key management
-
-### Analytics and Reporting
-
-- Real-time election statistics
-- Voter turnout analysis
-- Geographic voting patterns
-- Result visualization
-- Exportable reports
+| Component               | Details                                                                                                                                                                                                                                                                                                  |
+| :---------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Rust smart contract** | `smart_contract.rs` and `voting_mechanisms.rs` (over 2,200 lines combined), described in their own `Cargo.toml` as "Rust reference implementations of the QuantumBallot voting smart contract." They compile and have their own CI job, but the running backend calls the TypeScript version, not these. |
 
 ## Technology Stack
 
-### Backend
+| Area                     | Technology                                                                                                 |
+| :----------------------- | :--------------------------------------------------------------------------------------------------------- |
+| Backend API              | Node.js, TypeScript, Express                                                                               |
+| Blockchain               | Custom Proof-of-Work implementation, LevelDB, crypto-js (SHA-256)                                          |
+| Reference implementation | Rust (a separate, tested but unintegrated reimplementation of the smart contract)                          |
+| Auth                     | JWT, bcrypt, speakeasy (TOTP 2FA), qrcode                                                                  |
+| Real-time                | Socket.IO                                                                                                  |
+| Web frontend             | React, TypeScript, Vite, Tailwind CSS, Radix UI, Material UI, Recharts, MUI X-Charts, React Hook Form, Zod |
+| Mobile frontend          | React Native, Expo, TypeScript, React Navigation, React Native Paper, Expo Camera, Expo Secure Store       |
+| Infrastructure           | Docker, Kubernetes, Terraform, Ansible                                                                     |
+| Monitoring               | Prometheus, Grafana                                                                                        |
+| CI/CD                    | GitHub Actions                                                                                             |
+| Testing                  | Jest (backend, blockchain, web, and mobile)                                                                |
 
-- **Runtime**: Node.js
-- **Language**: TypeScript
-- **Framework**: Express
-- **Database**: LevelDB (for blockchain)
-- **Authentication**: JWT, bcrypt
-- **Real-time Communication**: Socket.IO
-- **Other Libraries**: crypto-js, nodemailer, qrcode, speakeasy
+## Architecture
 
-### Web Frontend
+```
+Clients
+  ├── web-frontend (React, TypeScript)     ── HTTP/Socket.IO ──┐
+  └── mobile-frontend (React Native)      ── HTTP/Socket.IO ──┤
+                                                              ▼
+Backend (Express, Node.js/TypeScript)
+  ├── Routes    /blockchain, /committee (also covers auth, 2FA, voter/candidate mgmt)
+  ├── Network    Socket.IO server, plus a separate axios-based P2P layer for
+  │              blockchain nodes
+  └── Email       Templated notifications
 
-- **Framework**: React
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS, SCSS
-- **State Management**: React Query
-- **UI Components**: Radix UI, Material UI
-- **Data Visualization**: Recharts, MUI X-Charts
-- **Form Handling**: React Hook Form, Zod
-- **Testing**: Vitest, Testing Library
+Blockchain (code/blockchain)
+  BlockChain (SHA-256 Proof-of-Work, LevelDB persistence)
+  SmartContract (TypeScript, election state machine, used by the backend)
+  Rust reference implementation (compiled and tested, not called by the backend)
+```
 
-### Mobile Frontend
-
-- **Framework**: React Native (Expo)
-- **Language**: TypeScript
-- **Navigation**: React Navigation
-- **UI Components**: React Native Paper
-- **Authentication**: Expo Secure Store
-- **Camera/QR**: Expo Camera, Expo Barcode Scanner
-- **Other**: React Native SVG, Vector Icons
-
-### Blockchain
-
-- Custom implementation with:
-  - Proof of Work consensus
-  - Cryptographic hashing
-  - Digital signatures
-  - Distributed ledger
-  - Smart contracts for election rules
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detail.
 
 ## Installation and Setup
 
-### Prerequisites
-
-- Node.js (v16+)
-- npm or yarn
-- Expo CLI (for mobile development)
-- Git
+Prerequisites: Node.js 16+, npm or yarn, and the Expo CLI for mobile development.
 
 ```bash
-# Clone the repository
-git clone https://github.com/quantsingularity/QuantumBallot.git
-cd QuantumBallot/backend
+git clone https://github.com/abrar2030/QuantumBallot.git
+cd QuantumBallot
 
-# Install dependencies
+# Backend
+cd code/backend
+npm install
+cp .env.example .env
+# edit .env with your configuration
+
+# Web frontend
+cd ../../web-frontend
 npm install
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
-
-# Start development server
-npm run dev
+# Mobile frontend
+cd ../mobile-frontend
+npm install
 ```
+
+Full, environment-specific instructions are in [docs/INSTALLATION.md](docs/INSTALLATION.md).
+
+## Running the Stack
+
+```bash
+# Full local stack (from infrastructure/, Docker required)
+docker compose up -d
+
+# Or run components individually:
+
+# Backend (from code/backend)
+npm run dev
+
+# Web dashboard (from web-frontend)
+npm run dev
+
+# Mobile app (from mobile-frontend)
+npm start
+```
+
+See [docs/USAGE.md](docs/USAGE.md) and [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
+
+## API Surface
+
+| Group                               | Prefix        | Highlights                                                                                               |
+| :---------------------------------- | :------------ | :------------------------------------------------------------------------------------------------------- |
+| Blockchain                          | `/blockchain` | Chain state, block and transaction queries, node registration                                            |
+| Committee (auth, voters, elections) | `/committee`  | Registration, login (web and mobile), logout, `refresh-token`, 2FA setup, voter and candidate management |
+
+Full request and response shapes are in [docs/API.md](docs/API.md).
 
 ## Testing
 
-The project maintains comprehensive test coverage across all components to ensure reliability and stability.
-
-### Test Coverage
-
-| Component       | Coverage | Status |
-| --------------- | -------- | ------ |
-| Backend API     | 92%      | ✅     |
-| Web Frontend    | 85%      | ✅     |
-| Mobile Frontend | 83%      | ✅     |
-| Blockchain Core | 90%      | ✅     |
-| Overall         | 87%      | ✅     |
-
-### Running Tests
-
 ```bash
-# Run backend tests
-cd backend
+# Backend (from code/backend)
 npm test
 
-# Run web frontend tests
-cd web-frontend
+# Blockchain (from code/blockchain)
 npm test
 
-# Run mobile frontend tests
-cd mobile-frontend
+# Rust reference implementation (from code/blockchain)
+cargo test
+
+# Web (from web-frontend)
+npm test
+
+# Mobile (from mobile-frontend)
 npm test
 ```
 
-### Testing Strategy
-
-- **Unit Tests**: Testing individual functions and components
-- **Integration Tests**: Testing interactions between different modules
-- **E2E Tests**: Testing complete user flows
-- **Contract Tests**: Ensuring API contracts are maintained
+The backend suite has 5 test files; the blockchain suite has 4. The web dashboard has 14 test files; the mobile app has 14.
 
 ## CI/CD Pipeline
 
-QuantumBallot uses GitHub Actions for continuous integration and deployment:
+GitHub Actions (`.github/workflows/cicd.yml`) runs four jobs on push, pull request, and manual dispatch:
 
-| Stage                | Control Area                    | Institutional-Grade Detail                                                              |
-| :------------------- | :------------------------------ | :-------------------------------------------------------------------------------------- |
-| **Formatting Check** | Change Triggers                 | Enforced on all `push` and `pull_request` events to `main` and `develop`                |
-|                      | Manual Oversight                | On-demand execution via controlled `workflow_dispatch`                                  |
-|                      | Source Integrity                | Full repository checkout with complete Git history for auditability                     |
-|                      | Python Runtime Standardization  | Python 3.10 with deterministic dependency caching                                       |
-|                      | Backend Code Hygiene            | `autoflake` to detect unused imports/variables using non-mutating diff-based validation |
-|                      | Backend Style Compliance        | `black --check` to enforce institutional formatting standards                           |
-|                      | Non-Intrusive Validation        | Temporary workspace comparison to prevent unauthorized source modification              |
-|                      | Node.js Runtime Control         | Node.js 18 with locked dependency installation via `npm ci`                             |
-|                      | Web Frontend Formatting Control | Prettier checks for web-facing assets                                                   |
-|                      | Mobile Frontend Formatting      | Prettier enforcement for mobile application codebases                                   |
-|                      | Documentation Governance        | Repository-wide Markdown formatting enforcement                                         |
-|                      | Infrastructure Configuration    | Prettier validation for YAML/YML infrastructure definitions                             |
-|                      | Compliance Gate                 | Any formatting deviation fails the pipeline and blocks merge                            |
+| Job                         | Depends on          | What it does                                                                                                                                                                                 |
+| :-------------------------- | :------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Code Quality Checks         | -                   | Formatter checks across the repository                                                                                                                                                       |
+| Backend Tests               | Code Quality Checks | Runs the Jest suite with coverage and uploads the coverage report as an artifact                                                                                                             |
+| Smart Contract Tests (Rust) | Code Quality Checks | Compiles and tests the Rust reference implementation (`cargo build`, `cargo test`); this exercises the standalone Rust binaries, not the TypeScript smart contract the backend actually runs |
+| Web Build                   | Code Quality Checks | Installs dependencies and produces the production web build (no test step)                                                                                                                   |
+
+There is currently no CI job for the mobile app.
 
 ## Documentation
 
-| Document                    | Path                 | Description                                                    |
-| :-------------------------- | :------------------- | :------------------------------------------------------------- |
-| **README**                  | `README.md`          | High-level overview, project scope, and repository entry point |
-| **Installation Guide**      | `INSTALLATION.md`    | Step-by-step installation and environment setup                |
-| **API Reference**           | `API.md`             | Detailed documentation for all API endpoints                   |
-| **CLI Reference**           | `CLI.md`             | Command-line interface usage, commands, and examples           |
-| **User Guide**              | `USAGE.md`           | Comprehensive end-user guide, workflows, and examples          |
-| **Architecture Overview**   | `ARCHITECTURE.md`    | System architecture, components, and design rationale          |
-| **Configuration Guide**     | `CONFIGURATION.md`   | Configuration options, environment variables, and tuning       |
-| **Feature Matrix**          | `FEATURE_MATRIX.md`  | Feature coverage, capabilities, and roadmap alignment          |
-| **Contributing Guidelines** | `CONTRIBUTING.md`    | Contribution workflow, coding standards, and PR requirements   |
-| **Troubleshooting**         | `TROUBLESHOOTING.md` | Common issues, diagnostics, and remediation steps              |
+| Document                                           | Contents                               |
+| :------------------------------------------------- | :------------------------------------- |
+| [docs/README.md](docs/README.md)                   | Documentation index                    |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)       | System architecture                    |
+| [docs/API.md](docs/API.md)                         | REST API reference                     |
+| [docs/INSTALLATION.md](docs/INSTALLATION.md)       | Setup for all components               |
+| [docs/CONFIGURATION.md](docs/CONFIGURATION.md)     | Environment variables and config       |
+| [docs/USAGE.md](docs/USAGE.md)                     | Running and using the platform         |
+| [docs/CLI.md](docs/CLI.md)                         | Helper scripts reference               |
+| [docs/FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md)   | Feature status, implemented vs planned |
+| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Common issues and fixes                |
+| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)       | Contribution guide                     |
+| [docs/examples/](docs/examples/)                   | Worked examples                        |
+
+## Contributing
+
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## License
 
